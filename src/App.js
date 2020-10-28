@@ -15,7 +15,7 @@ function App() {
   const [isSignedIn, setIsSignedIn] = useState(false);
   const [user, setUser] = useState(null);
   const [todoList, setTodoList] = useState([]);
-  // const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
   const [isChangedTodo, setIsChangedTodo] = useState(false);
   const db = firestore;
 
@@ -59,7 +59,7 @@ function App() {
         const docRef = db.collection('todolist').doc(auth.currentUser.uid);
         await docRef.update({ todo: { tasks: todoList } });
         console.log("Updating tasks in firebase!");
-        // setIsLoading(false);
+        setIsLoading(false);
       })();
     }
   }, [db, isChangedTodo, todoList, user]);

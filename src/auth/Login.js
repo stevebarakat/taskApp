@@ -15,10 +15,11 @@ const Login = ({ registerUser }) => {
   const { register, handleSubmit } = useForm();
   const [isToggled, setToggle] = useState(false);
   const [login, setLogin] = useState(false);
-  // const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [errMsg, setErrMsg] = useState(null);
 
   const onSubmit = async (data) => {
+    setIsLoading(true);
     try {
       if (login) {
         auth.signInWithEmailAndPassword(data.email, data.password)
@@ -38,7 +39,7 @@ const Login = ({ registerUser }) => {
     } catch (error) {
       setErrMsg(error.message);
     } finally {
-      // setIsLoading(false);
+      setIsLoading(false);
     }
   };
   
@@ -71,17 +72,17 @@ const Login = ({ registerUser }) => {
   };
 
   const googleSignIn = async () => {
-    // setIsLoading(true);
+    setIsLoading(true);
     await auth.signInWithPopup(provider);
   };
 
-  // if (isLoading) {
-  //   return (
-  //     <div>
-  //       <Spinner />
-  //     </div>
-  //   );
-  // }
+  if (isLoading) {
+    return (
+      <div>
+        <Spinner />
+      </div>
+    );
+  }
 
   return (
     <div style={{ padding: "1rem" }}>
