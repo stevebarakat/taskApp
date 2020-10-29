@@ -47,9 +47,9 @@ const Login = ({ registerUser }) => {
     return auth.onAuthStateChanged(async user => {
       if (!user) return;
       // create collection if one doesn't exist
-      const collection = firestore.collection('todolist').doc(auth.currentUser.uid);
+      const collection = firestore.collection('todolist').doc(user.uid);
       if (!collection.exists) {
-        await firestore.collection('todolist').doc(auth.currentUser.uid).set({
+        await firestore.collection('todolist').doc(user.uid).set({
           todo: {
             tasks: [
               {

@@ -31,42 +31,35 @@ function App() {
     });
   }, []);
 
-  // Update collection data in state based on user status
   useEffect(() => {
-    if (user == null) return;
-    (async () => {
-      db.collection('todolist').doc(auth.currentUser.uid).onSnapshot(doc => {
-        if (doc.exists) {
-          if (doc.data().todo.tasks)
-            setTodoList(doc.data().todo.tasks);
-          console.log("Updating local state from firebase!");
-          // setIsLoading(false);
-        }
-        // setIsLoading(false);
-      });
-
-    })();
-  }, [db, user]);
-
-  // Update task
-  useEffect(() => {
-    if (user == null) return;
-    if (areEqual(prevTodoList.current, todoList)) return;
-    prevTodoList.current = todoList;
-    if (isChangedTodo) {
+    return auth.onAuthStateChanged(user => {
+      if (user == null) return;
       (async () => {
-        // setIsLoading(true);
-        const docRef = db.collection('todolist').doc(auth.currentUser.uid);
-        await docRef.update({ todo: { tasks: todoList } });
-        console.log("Updating tasks in firebase!");
+        const resTodo = await db.collection('todolist').doc(user.uid).get();
+        if (resTodo.data().todo.tasks) setTodoList(resTodo.data().todo.tasks);
         setIsLoading(false);
       })();
-    }
-  }, [db, isChangedTodo, todoList, user]);
+    });
+  }, [db, user]);
+
+  useEffect(() => {
+    return auth.onAuthStateChanged(user => {
+      if (user == null) return;
+      if (isChangedTodo) {
+        (async () => {
+          setIsLoading(true);
+          const docRef = db.collection('todolist').doc(user.uid);
+          await docRef.update({ todo: { tasks: todoList } });
+          setIsLoading(false);
+        })();
+      }
+    });
+  }, [todoList, isChangedTodo, db, user]);
 
   const registerUser = (errMsg, userName) => {
     if (errMsg) return;
-    auth.onAuthStateChanged(user => {
+    return auth.onAuthStateChanged(user => {
+      if (user === null || user === undefined) return;
       user.updateProfile({
         displayName: userName
       }).then(() => {
@@ -106,7 +99,7 @@ function App() {
     tempTasks[taskIndex]['title'] = e.currentTarget.innerText;
 
     setTodoList(tempTasks);
-    const docRef = db.collection('todolist').doc(auth.currentUser.uid);
+    const docRef = db.collection('todolist').doc(user.userId);
     docRef.update({ todo: { tasks: todoList } });
   };
 
