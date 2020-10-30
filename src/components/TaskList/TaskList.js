@@ -43,7 +43,7 @@ const TaskList = ({ handleSetTodoList, handleSetIsChangedTodo, isSignedIn, user,
                 {todoList.length === 0 ?
                   <p>You don't have any tasks.</p> :
                   <div>
-                    {todoList.map((todo, index) => {
+                    {todoList?.map((todo, index) => {
                       return (
                         <Draggable key={todo.id} draggableId={todo.id} index={index}>
                           {(provided, snapshot) => {

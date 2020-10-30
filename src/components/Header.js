@@ -48,7 +48,7 @@ const Header = ({ isSignedIn, user }) => {
     <StyledHeader type={isSignedIn ? 'signedIn' : 'signedOut'}>
       {!isSignedIn && <Logo><ImList2 style={{ paddingTop: '.9rem' }} /></Logo>}
       <Title>Task <span style={{ fontWeight: '600' }}>App</span></Title>
-      {isSignedIn && user &&
+      {isSignedIn && 
         <div style={{position: "absolute", right: "18px"}}>
           <IconLink onClick={() => setModalOpen(true)}>
             {user.photoURL ?

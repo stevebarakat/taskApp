@@ -11,9 +11,9 @@ import Spinner from './components/Spinner';
 import "react-loader-spinner/dist/loader/css/react-spinner-loader.css";
 
 function App() {
+  const user = auth.currentUser;
   const prevTodoList = useRef([]);
   const [isSignedIn, setIsSignedIn] = useState(false);
-  const [user, setUser] = useState(null);
   const [todoList, setTodoList] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isChangedTodo, setIsChangedTodo] = useState(false);
@@ -23,38 +23,54 @@ function App() {
     return auth.onAuthStateChanged(user => {
       if (user) {
         setIsSignedIn(true);
-        setUser(user);
       } else {
         setIsSignedIn(false);
       }
-      // setIsLoading(false);
+      setIsLoading(false);
     });
   }, []);
 
-  useEffect(() => {
-    return auth.onAuthStateChanged(user => {
-      if (user == null) return;
-      (async () => {
-        const resTodo = await db.collection('todolist').doc(user.uid).get();
-        if (resTodo.data().todo.tasks) setTodoList(resTodo.data().todo.tasks);
-        setIsLoading(false);
-      })();
-    });
-  }, [db, user]);
-
-  useEffect(() => {
-    return auth.onAuthStateChanged(user => {
-      if (user == null) return;
-      if (isChangedTodo) {
-        (async () => {
-          setIsLoading(true);
-          const docRef = db.collection('todolist').doc(user.uid);
-          await docRef.update({ todo: { tasks: todoList } });
-          setIsLoading(false);
-        })();
+    // Update collection data in state based on user status
+    useEffect(() => {
+      return auth.onAuthStateChanged(user => {
+        if (user == null) return;
+        const unsubscribe = async () => {
+          if (user) {
+            const unsub = db.collection('todolist').doc(user.uid).onSnapshot(doc => {
+              if (doc.exists) {
+                if (doc.data().todo.tasks)
+                  setTodoList(doc.data().todo.tasks);
+                console.log("Updating local state from firebase!");
+                setIsLoading(false);
+              }
+              setIsLoading(false);
+              unsub();
+            });
+          }
+  
+        };
+        unsubscribe();
+      });
+    }, [db, user]);
+  
+    // Update task
+    useEffect(() => {
+      if (user) {
+        if (areEqual(prevTodoList.current, todoList)) return;
+        prevTodoList.current = todoList;
+        if (isChangedTodo) {
+          (async () => {
+            // setIsLoading(true);
+            const docRef = db.collection('todolist').doc(user.uid);
+            await docRef.update({ todo: { tasks: todoList } });
+            console.log("Updating tasks in firebase!");
+            setIsLoading(false);
+          })();
+        }
       }
-    });
-  }, [todoList, isChangedTodo, db, user]);
+    }, [db, isChangedTodo, todoList, user]);
+  
+  
 
   const registerUser = (errMsg, userName) => {
     if (errMsg) return;
@@ -62,13 +78,7 @@ function App() {
       if (user === null || user === undefined) return;
       user.updateProfile({
         displayName: userName
-      }).then(() => {
-        setUser({
-          user: user,
-          displayName: user.displayName,
-          userId: user.uid
-        });
-      });
+      })
     });
   };
 
@@ -99,17 +109,17 @@ function App() {
     tempTasks[taskIndex]['title'] = e.currentTarget.innerText;
 
     setTodoList(tempTasks);
-    const docRef = db.collection('todolist').doc(user.userId);
+    const docRef = db.collection('todolist').doc(user.uid);
     docRef.update({ todo: { tasks: todoList } });
   };
 
-  // if (isLoading) {
-  //   return (
-  //     <div>
-  //       <Spinner />
-  //     </div>
-  //   );
-  // }
+  if (isLoading) {
+    return (
+      <div>
+        <Spinner />
+      </div>
+    );
+  }
 
   return (
     <Layout isSignedIn={isSignedIn} user={user}>
