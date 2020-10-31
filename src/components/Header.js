@@ -27,7 +27,7 @@ const variants = {
   hidden: { opacity: 0, y: -100 },
 };
 
-const Header = ({ isSignedIn, user }) => {
+const Header = ({ isSignedIn, user, handleClearUser }) => {
   // Create a ref that we add to the element for which we want to detect outside clicks
   const ref = useRef();
   // State for our modal
@@ -39,7 +39,9 @@ const Header = ({ isSignedIn, user }) => {
     auth.signOut().then(function () {
       // Sign-out successful.
       setModalOpen(!isModalOpen);
-    }).catch(function (error) {
+    })
+    .then(() => handleClearUser())
+    .catch(function (error) {
       // An error happened.
     });
   };

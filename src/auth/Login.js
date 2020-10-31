@@ -29,7 +29,7 @@ const Login = ({ registerUser }) => {
       } else {
         auth.createUserWithEmailAndPassword(data.email, data.password)
           .then(() => {
-            registerUser(errMsg, data.displayName);
+            registerUser(data.displayName);
           })
           .then(() => handleFirstLogin())
           .catch(function (error) {

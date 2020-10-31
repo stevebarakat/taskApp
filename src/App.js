@@ -11,7 +11,10 @@ import Spinner from './components/Spinner';
 import "react-loader-spinner/dist/loader/css/react-spinner-loader.css";
 
 function App() {
-  const user = auth.currentUser;
+  const currentUser = auth.currentUser;
+  const [user, setUser] = useState({
+    photoURL: '',
+  });
   const prevTodoList = useRef([]);
   const [isSignedIn, setIsSignedIn] = useState(false);
   const [todoList, setTodoList] = useState([]);
@@ -23,6 +26,7 @@ function App() {
     return auth.onAuthStateChanged(user => {
       if (user) {
         setIsSignedIn(true);
+        setUser(user);
       } else {
         setIsSignedIn(false);
       }
@@ -30,57 +34,66 @@ function App() {
     });
   }, []);
 
-    // Update collection data in state based on user status
-    useEffect(() => {
-      return auth.onAuthStateChanged(user => {
-        if (user == null) return;
-        const unsubscribe = async () => {
-          if (user) {
-            const unsub = db.collection('todolist').doc(user.uid).onSnapshot(doc => {
-              if (doc.exists) {
-                if (doc.data().todo.tasks)
-                  setTodoList(doc.data().todo.tasks);
-                console.log("Updating local state from firebase!");
-                setIsLoading(false);
-              }
-              setIsLoading(false);
-              unsub();
-            });
-          }
-  
-        };
-        unsubscribe();
-      });
-    }, [db, user]);
-  
-    // Update task
-    useEffect(() => {
-      if (user) {
-        if (areEqual(prevTodoList.current, todoList)) return;
-        prevTodoList.current = todoList;
-        if (isChangedTodo) {
-          (async () => {
-            // setIsLoading(true);
-            const docRef = db.collection('todolist').doc(user.uid);
-            await docRef.update({ todo: { tasks: todoList } });
-            console.log("Updating tasks in firebase!");
-            setIsLoading(false);
-          })();
-        }
-      }
-    }, [db, isChangedTodo, todoList, user]);
-  
-  
-
-  const registerUser = (errMsg, userName) => {
-    if (errMsg) return;
+  // Update collection data in state based on user status
+  useEffect(() => {
     return auth.onAuthStateChanged(user => {
-      if (user === null || user === undefined) return;
-      user.updateProfile({
+      if (user == null) return;
+      const unsubscribe = async () => {
+        if (user) {
+          const unsub = db.collection('todolist').doc(user.uid).onSnapshot(doc => {
+            if (doc.exists) {
+              if (doc.data().todo.tasks)
+                setTodoList(doc.data().todo.tasks);
+              console.log("Updating local state from firebase!");
+              setIsLoading(false);
+            }
+            setIsLoading(false);
+            unsub();
+          });
+        }
+
+      };
+      unsubscribe();
+    });
+  }, [db, user]);
+
+  // Update task
+  useEffect(() => {
+    if (user) {
+      if (areEqual(prevTodoList.current, todoList)) return;
+      prevTodoList.current = todoList;
+      if (isChangedTodo) {
+        (async () => {
+          // setIsLoading(true);
+          const docRef = db.collection('todolist').doc(user.uid);
+          await docRef.update({ todo: { tasks: todoList } });
+          console.log("Updating tasks in firebase!");
+          setIsLoading(false);
+        })();
+      }
+    }
+  }, [db, isChangedTodo, todoList, user]);
+
+  const registerUser = userName => {
+    auth.onAuthStateChanged(FBUser => {
+      FBUser.updateProfile({
         displayName: userName
-      })
+      }).then(() => {
+        setUser(FBUser);
+      });
     });
   };
+
+  const handleClearUser = () => {
+    setUser({
+      displayName: '',
+      email: '',
+      password: '',
+      uid: '',
+      photoURL: '',
+    });
+  };
+  console.log(user);
 
   const handleSetIsChangedTodo = (value) => {
     setIsChangedTodo(value);
@@ -122,7 +135,7 @@ function App() {
   }
 
   return (
-    <Layout isSignedIn={isSignedIn} user={user}>
+    <Layout isSignedIn={isSignedIn} user={user} handleClearUser={handleClearUser}>
       <nav>
         <Router>
           {isSignedIn && <Redirect to="/tasks" />}
