@@ -11,7 +11,7 @@ import Spinner from '../components/Spinner';
 import "react-loader-spinner/dist/loader/css/react-spinner-loader.css";
 import { useForm } from 'react-hook-form';
 
-const Login = ({ registerUser }) => {
+const Login = ({ registerUser, user }) => {
   const { register, handleSubmit } = useForm();
   const [isToggled, setToggle] = useState(false);
   const [login, setLogin] = useState(false);
@@ -29,11 +29,7 @@ const Login = ({ registerUser }) => {
       } else {
         auth.createUserWithEmailAndPassword(data.email, data.password)
           .then(() => {
-            auth.onAuthStateChanged(FBUser => {
-              FBUser.updateProfile({
-                displayName: data.displayName
-              })
-            });
+            registerUser(data.displayName);
           })
           .then(() => handleFirstLogin())
           .catch(function (error) {
@@ -48,29 +44,30 @@ const Login = ({ registerUser }) => {
   };
 
   const handleFirstLogin = () => {
-    return auth.onAuthStateChanged(async user => {
-      if (!user) return;
-      // create collection if one doesn't exist
-      const collection = firestore.collection('todolist').doc(user.uid);
-      if (!collection.exists) {
-        await firestore.collection('todolist').doc(user.uid).set({
-          todo: {
-            tasks: [
-              {
-                id: 'lkj645lkj5464lk456jl456',
-                title: 'Example task, click to edit'
-              },
-              {
-                id: '097gdf08g7d90f8g7df098g7y',
-                title: 'Use the button on the left to delete'
-              },
-              {
-                id: 'kljngfifgnwrt6469fsd5ttsh',
-                title: 'Use the handle on the right to drag'
-              },
-            ]
-          }
-        });
+    auth.onAuthStateChanged(user => {
+      if (!!user) {
+        // create collection if one doesn't exist
+        const collection = firestore.collection('todolist').doc(user.uid);
+        if (!collection.exists) {
+          firestore.collection('todolist').doc(user.uid).set({
+            todo: {
+              tasks: [
+                {
+                  id: 'lkj645lkj5464lk456jl456',
+                  title: 'Example task, click to edit'
+                },
+                {
+                  id: '097gdf08g7d90f8g7df098g7y',
+                  title: 'Use the button on the left to delete'
+                },
+                {
+                  id: 'kljngfifgnwrt6469fsd5ttsh',
+                  title: 'Use the handle on the right to drag'
+                },
+              ]
+            }
+          });
+        }
       }
     });
   };

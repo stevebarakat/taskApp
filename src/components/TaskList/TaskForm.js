@@ -12,7 +12,7 @@ const TaskForm = ({ handleSetTodoList, handleSetIsChangedTodo, handleSetInput, t
     if (!!data) {
       handleSetIsChangedTodo(true);
       handleSetTodoList([...todoList, {
-            title: data.task,
+        title: data.task,
         id: uuidv4(),
       }]);
       reset();

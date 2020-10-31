@@ -12,7 +12,8 @@ import "react-loader-spinner/dist/loader/css/react-spinner-loader.css";
 import useAuth from './auth/useAuth';
 
 function App() {
-  const user = useAuth();
+  const [user, setUser] = useState(null);
+  // const user = useAuth();
   const prevTodoList = useRef([]);
   const [isSignedIn, setIsSignedIn] = useState(false);
   const [todoList, setTodoList] = useState([]);
@@ -24,14 +25,39 @@ function App() {
     return auth.onAuthStateChanged(user => {
       if (user) {
         setIsSignedIn(true);
-        // setUser(user);
+        setUser({
+          displayName: user.displayName,
+          photoUrl: user.photoURL,
+          userId: user.uid,
+          email: user.email,
+        });
       } else {
+        setUser(null);
         setIsSignedIn(false);
       }
       setIsLoading(false);
     });
   }, []);
 
+  console.log(user);
+
+  // Update task
+  useEffect(() => {
+    if (user) {
+      if (areEqual(prevTodoList.current, todoList)) return;
+      prevTodoList.current = todoList;
+      if (isChangedTodo) {
+        (async () => {
+          // setIsLoading(true);
+          const docRef = db.collection('todolist').doc(user.userId);
+          await docRef.update({ todo: { tasks: todoList } });
+          console.log("Updating tasks in firebase!");
+          setIsLoading(false);
+        })();
+      }
+    }
+  }, [db, isChangedTodo, todoList, user]);
+  
   // Update collection data in state based on user status
   useEffect(() => {
     return auth.onAuthStateChanged(user => {
@@ -55,25 +81,8 @@ function App() {
     });
   }, [db, user]);
 
-  // Update task
-  useEffect(() => {
-    if (user) {
-      if (areEqual(prevTodoList.current, todoList)) return;
-      prevTodoList.current = todoList;
-      if (isChangedTodo) {
-        (async () => {
-          // setIsLoading(true);
-          const docRef = db.collection('todolist').doc(user.uid);
-          await docRef.update({ todo: { tasks: todoList } });
-          console.log("Updating tasks in firebase!");
-          setIsLoading(false);
-        })();
-      }
-    }
-  }, [db, isChangedTodo, todoList, user]);
-
   const registerUser = userName => {
-    auth.onAuthStateChanged(FBUser => {
+    return auth.onAuthStateChanged(FBUser => {
       FBUser.updateProfile({
         displayName: userName
       })
@@ -122,7 +131,7 @@ function App() {
     tempTasks[taskIndex]['title'] = e.currentTarget.innerText;
 
     setTodoList(tempTasks);
-    const docRef = db.collection('todolist').doc(user.uid);
+    const docRef = db.collection('todolist').doc(user.userId);
     docRef.update({ todo: { tasks: todoList } });
   };
 
@@ -155,7 +164,7 @@ function App() {
                 handleSetIsChangedTodo={handleSetIsChangedTodo}
                 handleSetTodoList={handleSetTodoList}
               />} />
-            <Route path="/signin" component={() => <Login />} />
+            <Route path="/signin" component={() => <Login user={user} registerUser={registerUser} />} />
           </>
         </Router>
       </nav>
