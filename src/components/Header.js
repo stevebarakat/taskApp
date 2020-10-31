@@ -53,7 +53,7 @@ const Header = ({ isSignedIn, user, handleClearUser }) => {
       {isSignedIn && 
         <div style={{position: "absolute", right: "18px"}}>
           <IconLink onClick={() => setModalOpen(true)}>
-            {user.photoURL ?
+            {user?.photoURL ?
               <img
                 style={{borderRadius: "4px", border: "1px solid #707070"}}
                 alt={user.displayName} 

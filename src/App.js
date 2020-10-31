@@ -9,12 +9,10 @@ import TaskList from './components/TaskList/TaskList';
 import Layout from './components/Layout';
 import Spinner from './components/Spinner';
 import "react-loader-spinner/dist/loader/css/react-spinner-loader.css";
+import useAuth from './auth/useAuth';
 
 function App() {
-  const currentUser = auth.currentUser;
-  const [user, setUser] = useState({
-    photoURL: '',
-  });
+  const user = useAuth();
   const prevTodoList = useRef([]);
   const [isSignedIn, setIsSignedIn] = useState(false);
   const [todoList, setTodoList] = useState([]);
@@ -26,7 +24,7 @@ function App() {
     return auth.onAuthStateChanged(user => {
       if (user) {
         setIsSignedIn(true);
-        setUser(user);
+        // setUser(user);
       } else {
         setIsSignedIn(false);
       }
@@ -78,22 +76,24 @@ function App() {
     auth.onAuthStateChanged(FBUser => {
       FBUser.updateProfile({
         displayName: userName
-      }).then(() => {
-        setUser(FBUser);
-      });
+      })
     });
   };
 
-  const handleClearUser = () => {
-    setUser({
-      displayName: '',
-      email: '',
-      password: '',
-      uid: '',
-      photoURL: '',
-    });
-  };
-  console.log(user);
+  // const handleClearUser = () => {
+  //   setUser({
+  //     displayName: '',
+  //     email: '',
+  //     password: '',
+  //     uid: '',
+  //     photoURL: '',
+  //   });
+  // };
+  // console.log(user);
+
+  // const handleSetUser = user => {
+  //   setUser(user);
+  // }
 
   const handleSetIsChangedTodo = (value) => {
     setIsChangedTodo(value);
@@ -135,7 +135,7 @@ function App() {
   }
 
   return (
-    <Layout isSignedIn={isSignedIn} user={user} handleClearUser={handleClearUser}>
+    <Layout isSignedIn={isSignedIn} user={user}>
       <nav>
         <Router>
           {isSignedIn && <Redirect to="/tasks" />}
@@ -155,7 +155,7 @@ function App() {
                 handleSetIsChangedTodo={handleSetIsChangedTodo}
                 handleSetTodoList={handleSetTodoList}
               />} />
-            <Route path="/signin" component={() => <Login registerUser={registerUser} />} />
+            <Route path="/signin" component={() => <Login />} />
           </>
         </Router>
       </nav>

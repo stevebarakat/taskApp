@@ -29,12 +29,16 @@ const Login = ({ registerUser }) => {
       } else {
         auth.createUserWithEmailAndPassword(data.email, data.password)
           .then(() => {
-            registerUser(data.displayName);
+            auth.onAuthStateChanged(FBUser => {
+              FBUser.updateProfile({
+                displayName: data.displayName
+              })
+            });
           })
           .then(() => handleFirstLogin())
           .catch(function (error) {
             setErrMsg(error.message);
-          })
+          });
       }
     } catch (error) {
       setErrMsg(error.message);
@@ -42,7 +46,7 @@ const Login = ({ registerUser }) => {
       setIsLoading(false);
     }
   };
-  
+
   const handleFirstLogin = () => {
     return auth.onAuthStateChanged(async user => {
       if (!user) return;
