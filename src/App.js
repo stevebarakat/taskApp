@@ -9,11 +9,9 @@ import TaskList from './components/TaskList/TaskList';
 import Layout from './components/Layout';
 import Spinner from './components/Spinner';
 import "react-loader-spinner/dist/loader/css/react-spinner-loader.css";
-import useAuth from './auth/useAuth';
 
 function App() {
   const [user, setUser] = useState(null);
-  // const user = useAuth();
   const prevTodoList = useRef([]);
   const [isSignedIn, setIsSignedIn] = useState(false);
   const [todoList, setTodoList] = useState([]);
@@ -22,93 +20,103 @@ function App() {
   const db = firestore;
 
   useEffect(() => {
-    return auth.onAuthStateChanged(user => {
-      if (user) {
-        setIsSignedIn(true);
-        setUser({
-          displayName: user.displayName,
-          photoUrl: user.photoURL,
-          userId: user.uid,
-          email: user.email,
-        });
-      } else {
-        setUser(null);
-        setIsSignedIn(false);
-      }
-      setIsLoading(false);
-    });
-  }, []);
+    if (user) {
+      setIsSignedIn(true);
+      createFirstList(user.uid);
+    } else {
+      setIsSignedIn(false);
+    }
+    setIsLoading(false);
+  }, [user]);
 
-  console.log(user);
+  console.log(user?.email + ": " + user?.displayName + ": " + user?.userId);
+
+  // Update collection data in state based on user status
+  useEffect(() => {
+    if (user === null) return;
+    const unsubscribe = async () => {
+      if (user) {
+        const unsub = db.collection('todolist').doc(user.userId).onSnapshot(doc => {
+          if (doc.exists) {
+            if (doc.data().todo.tasks)
+              setTodoList(doc.data().todo.tasks);
+            console.log("Updating local state from firebase!");
+            setIsLoading(false);
+          }
+          setIsLoading(false);
+          return () => unsub();
+        });
+      }
+
+    };
+    return () => unsubscribe();
+  }, [db, user]);
 
   // Update task
   useEffect(() => {
-    if (user) {
-      if (areEqual(prevTodoList.current, todoList)) return;
-      prevTodoList.current = todoList;
-      if (isChangedTodo) {
-        (async () => {
-          // setIsLoading(true);
-          const docRef = db.collection('todolist').doc(user.userId);
-          await docRef.update({ todo: { tasks: todoList } });
-          console.log("Updating tasks in firebase!");
-          setIsLoading(false);
-        })();
-      }
-    }
-  }, [db, isChangedTodo, todoList, user]);
-  
-  // Update collection data in state based on user status
-  useEffect(() => {
-    return auth.onAuthStateChanged(user => {
-      if (user == null) return;
-      const unsubscribe = async () => {
-        if (user) {
-          const unsub = db.collection('todolist').doc(user.uid).onSnapshot(doc => {
-            if (doc.exists) {
-              if (doc.data().todo.tasks)
-                setTodoList(doc.data().todo.tasks);
-              console.log("Updating local state from firebase!");
-              setIsLoading(false);
-            }
+    (async (user) => {
+      if (user) {
+        if (areEqual(prevTodoList.current, todoList)) return;
+        prevTodoList.current = todoList;
+        if (isChangedTodo) {
+          (async () => {
+            // setIsLoading(true);
+            const docRef = db.collection('todolist').doc(user.userId);
+            await docRef.update({ todo: { tasks: todoList } });
+            console.log("Updating tasks in firebase!");
             setIsLoading(false);
-            unsub();
-          });
+          })();
         }
+      }
+    })();
+  }, [db, isChangedTodo, todoList, user]);
 
-      };
-      unsubscribe();
-    });
-  }, [db, user]);
 
   const registerUser = userName => {
     return auth.onAuthStateChanged(FBUser => {
+      if (FBUser === null) return;
       FBUser.updateProfile({
         displayName: userName
       })
+        .then(() => {
+          setUser({
+            ...FBUser,
+            displayName: FBUser.displayName,
+            userId: FBUser.uid,
+          });
+        });
     });
   };
 
-  // const handleClearUser = () => {
-  //   setUser({
-  //     displayName: '',
-  //     email: '',
-  //     password: '',
-  //     uid: '',
-  //     photoURL: '',
-  //   });
-  // };
-  // console.log(user);
-
-  // const handleSetUser = user => {
-  //   setUser(user);
-  // }
-
-  const handleSetIsChangedTodo = (value) => {
-    setIsChangedTodo(value);
+  const createFirstList = (user) => {
+    if (!!user) {
+      // create collection if one doesn't exist
+      const collection = firestore.collection('todolist').doc(user);
+      if (!collection.exists) {
+        firestore.collection('todolist').doc(user).set({
+          todo: {
+            tasks: [
+              {
+                id: 'lkj645lkj5464lk456jl456',
+                title: 'Example task, click to edit'
+              },
+              {
+                id: '097gdf08g7d90f8g7df098g7y',
+                title: 'Use the button on the left to delete'
+              },
+              {
+                id: 'kljngfifgnwrt6469fsd5ttsh',
+                title: 'Use the handle on the right to drag'
+              },
+            ]
+          }
+        });
+      }
+    }
   };
 
   const handleSetTodoList = (_todoList) => {
+    setIsChangedTodo(true);
     setTodoList(_todoList);
   };
 
@@ -120,6 +128,12 @@ function App() {
   const updateTodo = (todoList) => {
     setIsChangedTodo(true);
     setTodoList([...todoList]);
+  };
+
+  const logOutUser = e => {
+    e.preventDefault();
+    setUser(null);
+    auth.signOut();
   };
 
   const updateTask = (e, id) => {
@@ -144,7 +158,7 @@ function App() {
   }
 
   return (
-    <Layout isSignedIn={isSignedIn} user={user}>
+    <Layout isSignedIn={isSignedIn} logOutUser={logOutUser} user={user}>
       <nav>
         <Router>
           {isSignedIn && <Redirect to="/tasks" />}
@@ -161,7 +175,6 @@ function App() {
                 deleteTodo={deleteTodo}
                 updateTodo={updateTodo}
                 updateTask={updateTask}
-                handleSetIsChangedTodo={handleSetIsChangedTodo}
                 handleSetTodoList={handleSetTodoList}
               />} />
             <Route path="/signin" component={() => <Login user={user} registerUser={registerUser} />} />

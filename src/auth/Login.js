@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useReducer } from 'react';
 import { Center, TextInput, Field, InputIcon, Flex, ErrorMessage } from '../styles/style';
-import { auth, firestore, provider } from '../firebase';
+import { auth, firestore } from '../firebase';
 import Modal from './Modal';
 import { Button, BtnLink, Label } from '../styles/style';
 import ForgotPassword from './ForgotPassword';
@@ -11,70 +11,38 @@ import Spinner from '../components/Spinner';
 import "react-loader-spinner/dist/loader/css/react-spinner-loader.css";
 import { useForm } from 'react-hook-form';
 
-const Login = ({ registerUser, user }) => {
-  const { register, handleSubmit } = useForm();
+const Login = ({ registerUser }) => {
+  const { register, handleSubmit, reset } = useForm();
   const [isToggled, setToggle] = useState(false);
-  const [login, setLogin] = useState(false);
+  const [newUser, setNewUser] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errMsg, setErrMsg] = useState(null);
 
   const onSubmit = async (data) => {
     setIsLoading(true);
     try {
-      if (login) {
-        auth.signInWithEmailAndPassword(data.email, data.password)
-          .catch(error => {
-            setErrMsg(error.message);
-          });
-      } else {
+      if (newUser) {
         auth.createUserWithEmailAndPassword(data.email, data.password)
           .then(() => {
             registerUser(data.displayName);
           })
-          .then(() => handleFirstLogin())
+          // .then(() => handleFirstNewUser())
           .catch(function (error) {
             setErrMsg(error.message);
           });
+      } else {
+        auth.signInWithEmailAndPassword(data.email, data.password)
+          .catch(error => {
+            setErrMsg(error.message);
+          });
       }
-    } catch (error) {
-      setErrMsg(error.message);
-    } finally {
+    }
+    catch (err) {
+      setErrMsg(err);
+    }
+    finally {
       setIsLoading(false);
     }
-  };
-
-  const handleFirstLogin = () => {
-    auth.onAuthStateChanged(user => {
-      if (!!user) {
-        // create collection if one doesn't exist
-        const collection = firestore.collection('todolist').doc(user.uid);
-        if (!collection.exists) {
-          firestore.collection('todolist').doc(user.uid).set({
-            todo: {
-              tasks: [
-                {
-                  id: 'lkj645lkj5464lk456jl456',
-                  title: 'Example task, click to edit'
-                },
-                {
-                  id: '097gdf08g7d90f8g7df098g7y',
-                  title: 'Use the button on the left to delete'
-                },
-                {
-                  id: 'kljngfifgnwrt6469fsd5ttsh',
-                  title: 'Use the handle on the right to drag'
-                },
-              ]
-            }
-          });
-        }
-      }
-    });
-  };
-
-  const googleSignIn = async () => {
-    setIsLoading(true);
-    await auth.signInWithPopup(provider);
   };
 
   if (isLoading) {
@@ -88,10 +56,10 @@ const Login = ({ registerUser, user }) => {
   return (
     <div style={{ padding: "1rem" }}>
       <Center style={{ padding: "0.5rem" }}>
-        <BtnLink onClick={() => setLogin(login => !login)}>{login ? "need to create an account?" : "already have an account?"}</BtnLink>
+        <BtnLink onClick={() => setNewUser(newUser => !newUser)}>{!newUser ? "need to create an account?" : "already have an account?"}</BtnLink>
       </Center>
       <form onSubmit={handleSubmit(onSubmit)}>
-        {!login && <Field>
+        {newUser && <Field>
           <InputIcon><FaUser /></InputIcon>
           <TextInput
             signIn
@@ -130,12 +98,9 @@ const Login = ({ registerUser, user }) => {
         </Field>
         {errMsg && <ErrorMessage>{errMsg}</ErrorMessage>}
         <Flex>
-          <Button type="submit">{login ? "login" : "create account"}</Button>
+          <Button type="submit">{newUser ? "create account" : "sign in"}</Button>
         </Flex>
       </form>
-      <Flex>
-        <Button google btnType="google" onClick={googleSignIn}>Sign in with Google</Button>
-      </Flex>
       <BtnLink
         secondary
         style={{ marginTop: "1.5rem" }}

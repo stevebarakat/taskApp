@@ -14,7 +14,7 @@ const onDragEnd = (result, todoList, updateTodo) => {
   updateTodo(_taskList);
 };
 
-const TaskList = ({ handleSetTodoList, handleSetIsChangedTodo, isSignedIn, user, todoList, addTodo, deleteTodo, updateTodo, updateTask, handleSetInput }) => {
+const TaskList = ({ handleSetTodoList, isSignedIn, user, todoList, addTodo, deleteTodo, updateTodo, updateTask, handleSetInput }) => {
   return (
     <div style={{ paddingBottom: "1.5rem" }}>
       <TaskForm
@@ -26,7 +26,6 @@ const TaskList = ({ handleSetTodoList, handleSetIsChangedTodo, isSignedIn, user,
         updateTodo={updateTodo}
         updateTask={updateTask}
         handleSetInput={handleSetInput}
-        handleSetIsChangedTodo={handleSetIsChangedTodo}
         handleSetTodoList={handleSetTodoList}
       />
       <DragDropContext onDragEnd={result => onDragEnd(result, todoList, updateTodo)}>

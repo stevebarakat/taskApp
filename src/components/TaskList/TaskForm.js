@@ -5,12 +5,11 @@ import { useForm } from 'react-hook-form';
 import { RiAddLine } from 'react-icons/ri';
 import { BsPencil } from 'react-icons/bs';
 
-const TaskForm = ({ handleSetTodoList, handleSetIsChangedTodo, handleSetInput, todoList }) => {
+const TaskForm = ({ handleSetTodoList, todoList }) => {
   const { register, handleSubmit, reset } = useForm();
 
   const onSubmit = async (data) => {
     if (!!data) {
-      handleSetIsChangedTodo(true);
       handleSetTodoList([...todoList, {
         title: data.task,
         id: uuidv4(),
