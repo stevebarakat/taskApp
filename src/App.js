@@ -19,24 +19,26 @@ function App() {
   const [isChangedTodo, setIsChangedTodo] = useState(false);
   const db = firestore;
 
-  useEffect(() => {
+  auth.onAuthStateChanged((user) => {
+    console.log(user?.email + ": " + user?.displayName + ": " + user?.uid);
     if (user) {
       setIsSignedIn(true);
+      setUser(user);
       createFirstList(user.uid);
     } else {
       setIsSignedIn(false);
     }
     setIsLoading(false);
-  }, [user]);
+  });
 
-  console.log(user?.email + ": " + user?.displayName + ": " + user?.userId);
+  console.log(user?.email + ": " + user?.displayName + ": " + user?.uid);
 
   // Update collection data in state based on user status
   useEffect(() => {
-    if (user === null) return;
+    if (auth.currentUser === null) return;
     const unsubscribe = async () => {
-      if (user) {
-        const unsub = db.collection('todolist').doc(user.userId).onSnapshot(doc => {
+      if (auth.currentUser) {
+        const unsub = db.collection('todolist').doc(auth.currentUser.uid).onSnapshot(doc => {
           if (doc.exists) {
             if (doc.data().todo.tasks)
               setTodoList(doc.data().todo.tasks);
@@ -50,7 +52,7 @@ function App() {
 
     };
     return () => unsubscribe();
-  }, [db, user]);
+  }, [db]);
 
   // Update task
   useEffect(() => {
@@ -61,7 +63,7 @@ function App() {
         if (isChangedTodo) {
           (async () => {
             // setIsLoading(true);
-            const docRef = db.collection('todolist').doc(user.userId);
+            const docRef = db.collection('todolist').doc(user.uid);
             await docRef.update({ todo: { tasks: todoList } });
             console.log("Updating tasks in firebase!");
             setIsLoading(false);
@@ -73,18 +75,16 @@ function App() {
 
 
   const registerUser = userName => {
-    return auth.onAuthStateChanged(FBUser => {
-      if (FBUser === null) return;
-      FBUser.updateProfile({
-        displayName: userName
-      })
-        .then(() => {
-          setUser({
-            ...FBUser,
-            displayName: FBUser.displayName,
-            userId: FBUser.uid,
-          });
-        });
+    const FBUser = auth.currentUser;
+    if (FBUser === null) return;
+    FBUser.updateProfile({
+      displayName: userName
+    })
+    .then(() => {
+      setUser({
+        ...FBUser,
+        // displayName: FBUser.displayName,
+      });
     });
   };
 
@@ -145,7 +145,7 @@ function App() {
     tempTasks[taskIndex]['title'] = e.currentTarget.innerText;
 
     setTodoList(tempTasks);
-    const docRef = db.collection('todolist').doc(user.userId);
+    const docRef = db.collection('todolist').doc(user.uid);
     docRef.update({ todo: { tasks: todoList } });
   };
 
@@ -156,6 +156,7 @@ function App() {
       </div>
     );
   }
+  console.log(auth.currentUser?.email + ": " + auth.currentUser?.displayName + ": " + auth.currentUser?.uid);
 
   return (
     <Layout isSignedIn={isSignedIn} logOutUser={logOutUser} user={user}>
