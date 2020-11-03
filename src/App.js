@@ -19,100 +19,82 @@ function App() {
   const [isChangedTodo, setIsChangedTodo] = useState(false);
   const db = firestore;
 
+  // Handle login status
   auth.onAuthStateChanged((user) => {
-    console.log(user?.email + ": " + user?.displayName + ": " + user?.uid);
     if (user) {
       setIsSignedIn(true);
       setUser(user);
-      createFirstList(user.uid);
     } else {
       setIsSignedIn(false);
     }
     setIsLoading(false);
   });
 
-  console.log(user?.email + ": " + user?.displayName + ": " + user?.uid);
-
-  // Update collection data in state based on user status
+  // Update tasks in Firebase 
   useEffect(() => {
-    if (auth.currentUser === null) return;
-    const unsubscribe = async () => {
+    // auth.onAuthStateChanged(user => {
       if (auth.currentUser) {
-        const unsub = db.collection('todolist').doc(auth.currentUser.uid).onSnapshot(doc => {
-          if (doc.exists) {
-            if (doc.data().todo.tasks)
-              setTodoList(doc.data().todo.tasks);
-            console.log("Updating local state from firebase!");
-            setIsLoading(false);
-          }
-          setIsLoading(false);
-          return () => unsub();
-        });
-      }
-
-    };
-    return () => unsubscribe();
-  }, [db]);
-
-  // Update task
-  useEffect(() => {
-    (async (user) => {
-      if (user) {
         if (areEqual(prevTodoList.current, todoList)) return;
         prevTodoList.current = todoList;
         if (isChangedTodo) {
           (async () => {
-            // setIsLoading(true);
-            const docRef = db.collection('todolist').doc(user.uid);
+            const docRef = db.collection('todolist').doc(auth.currentUser.uid);
             await docRef.update({ todo: { tasks: todoList } });
             console.log("Updating tasks in firebase!");
-            setIsLoading(false);
           })();
         }
       }
+    // });
+  }, [db, isChangedTodo, todoList]);
+
+  // Update local state from Firebase 
+  useEffect(() => {
+    if (user === null) return;
+    (async () => {
+      const resTodo = await db.collection('todolist').doc(user.uid).get();
+      if (resTodo.data().todo.tasks) setTodoList(resTodo.data().todo.tasks);
     })();
-  }, [db, isChangedTodo, todoList, user]);
+  }, [user, db]);
 
-
+  // Create New User
   const registerUser = userName => {
     const FBUser = auth.currentUser;
     if (FBUser === null) return;
     FBUser.updateProfile({
       displayName: userName
     })
-    .then(() => {
-      setUser({
-        ...FBUser,
-        // displayName: FBUser.displayName,
+      .then(() => {
+        setUser(FBUser);
+      })
+      .then(() => {
+        const collection = firestore.collection('todolist').doc(FBUser.uid);
+        if (!collection.exists) {
+          firestore.collection('todolist').doc(FBUser.uid).set({
+            todo: {
+              tasks: [
+                {
+                  id: 'lkj645lkj5464lk456jl456',
+                  title: 'Example task, click to edit'
+                },
+                {
+                  id: '097gdf08g7d90f8g7df098g7y',
+                  title: 'Use the button on the left to delete'
+                },
+                {
+                  id: 'kljngfifgnwrt6469fsd5ttsh',
+                  title: 'Use the handle on the right to drag'
+                },
+              ]
+            }
+          });
+        }
       });
-    });
   };
 
-  const createFirstList = (user) => {
-    if (!!user) {
-      // create collection if one doesn't exist
-      const collection = firestore.collection('todolist').doc(user);
-      if (!collection.exists) {
-        firestore.collection('todolist').doc(user).set({
-          todo: {
-            tasks: [
-              {
-                id: 'lkj645lkj5464lk456jl456',
-                title: 'Example task, click to edit'
-              },
-              {
-                id: '097gdf08g7d90f8g7df098g7y',
-                title: 'Use the button on the left to delete'
-              },
-              {
-                id: 'kljngfifgnwrt6469fsd5ttsh',
-                title: 'Use the handle on the right to drag'
-              },
-            ]
-          }
-        });
-      }
-    }
+  const logOutUser = e => {
+    e.preventDefault();
+    setUser(null);
+    auth.signOut();
   };
 
   const handleSetTodoList = (_todoList) => {
@@ -120,20 +102,9 @@ function App() {
     setTodoList(_todoList);
   };
 
-  const deleteTodo = (index) => {
-    setIsChangedTodo(true);
-    setTodoList(todoList.filter((todo, i) => i !== index));
-  };
-
   const updateTodo = (todoList) => {
     setIsChangedTodo(true);
     setTodoList([...todoList]);
-  };
-
-  const logOutUser = e => {
-    e.preventDefault();
-    setUser(null);
-    auth.signOut();
   };
 
   const updateTask = (e, id) => {
@@ -149,6 +120,11 @@ function App() {
     docRef.update({ todo: { tasks: todoList } });
   };
 
+  const deleteTodo = (index) => {
+    setIsChangedTodo(true);
+    setTodoList(todoList.filter((todo, i) => i !== index));
+  };
+
   if (isLoading) {
     return (
       <div>
@@ -156,7 +132,8 @@ function App() {
       </div>
     );
   }
-  console.log(auth.currentUser?.email + ": " + auth.currentUser?.displayName + ": " + auth.currentUser?.uid);
+  // console.log(auth.currentUser?.email + ": " + auth.currentUser?.displayName + ": " + auth.currentUser?.uid);
+  console.log(todoList);
 
   return (
     <Layout isSignedIn={isSignedIn} logOutUser={logOutUser} user={user}>

@@ -1,6 +1,6 @@
-import React, { useState, useReducer } from 'react';
+import React, { useState } from 'react';
 import { Center, TextInput, Field, InputIcon, Flex, ErrorMessage } from '../styles/style';
-import { auth, firestore } from '../firebase';
+import { auth } from '../firebase';
 import Modal from './Modal';
 import { Button, BtnLink, Label } from '../styles/style';
 import ForgotPassword from './ForgotPassword';
@@ -26,7 +26,6 @@ const Login = ({ registerUser }) => {
           .then(() => {
             registerUser(data.displayName);
           })
-          // .then(() => handleFirstNewUser())
           .catch(function (error) {
             setErrMsg(error.message);
           });
@@ -41,6 +40,7 @@ const Login = ({ registerUser }) => {
       setErrMsg(err);
     }
     finally {
+      reset();
       setIsLoading(false);
     }
   };

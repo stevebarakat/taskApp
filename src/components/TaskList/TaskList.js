@@ -14,18 +14,11 @@ const onDragEnd = (result, todoList, updateTodo) => {
   updateTodo(_taskList);
 };
 
-const TaskList = ({ handleSetTodoList, isSignedIn, user, todoList, addTodo, deleteTodo, updateTodo, updateTask, handleSetInput }) => {
+const TaskList = ({ handleSetTodoList, todoList, deleteTodo, updateTodo, updateTask }) => {
   return (
     <div style={{ paddingBottom: "1.5rem" }}>
       <TaskForm
-        addTodo={addTodo}
-        user={user}
-        isSignedIn={isSignedIn}
         todoList={todoList}
-        deleteTodo={deleteTodo}
-        updateTodo={updateTodo}
-        updateTask={updateTask}
-        handleSetInput={handleSetInput}
         handleSetTodoList={handleSetTodoList}
       />
       <DragDropContext onDragEnd={result => onDragEnd(result, todoList, updateTodo)}>
@@ -64,7 +57,6 @@ const TaskList = ({ handleSetTodoList, isSignedIn, user, todoList, addTodo, dele
                                       contentEditable
                                       suppressContentEditableWarning
                                       onBlur={e => {
-                                        console.log("blur");
                                         updateTask(e, todo.id);
                                       }}
                                     >
