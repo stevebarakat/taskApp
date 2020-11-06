@@ -1,5 +1,5 @@
 import React, { useState, Suspense } from 'react';
-import { auth, firestore } from "./firebase";
+import { auth, firestore, provider } from "./firebase";
 import './styles/reset.css';
 import './styles/global.scss';
 import Spinner from './components/Spinner';
@@ -74,6 +74,10 @@ export default function App() {
       });
   };
 
+  const googleSignIn = async () => {
+    await auth.signInWithPopup(provider);
+  };
+
   return user ?
     <Suspense fallback={<span><Spinner /></span>}>
       <AuthApp
@@ -83,6 +87,7 @@ export default function App() {
     </Suspense> :
     <Suspense fallback={<Spinner />}>
       <Login
+        googleSignIn={googleSignIn}
         isNewUser={isNewUser}
         createNewUser={createNewUser}
         handleSetIsNewUser={handleSetIsNewUser}
