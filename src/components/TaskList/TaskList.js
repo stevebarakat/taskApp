@@ -4,8 +4,6 @@ import { ListItem, ListItemContainer, EndCap, TaskText, BtnLink } from '../../st
 import { MdDragHandle } from 'react-icons/md';
 import { VscChromeClose } from 'react-icons/vsc';
 import TaskForm from './TaskForm';
-import Spinner from '../Spinner';
-import "react-loader-spinner/dist/loader/css/react-spinner-loader.css";
 
 const onDragEnd = (result, todoList, updateTodo) => {
   if (!result.destination) return;

@@ -3,10 +3,8 @@ import { auth, firestore } from "./firebase";
 import { findIndex } from 'lodash';
 import './styles/reset.css';
 import './styles/global.scss';
-import TaskList from './components/TaskList/TaskList';
 import Layout from './components/Layout';
-import Spinner from './components/Spinner';
-import "react-loader-spinner/dist/loader/css/react-spinner-loader.css";
+import TaskList from './components/TaskList/TaskList';
 
 function AuthApp({ user, handleSetUser }) {
   const [todoList, setTodoList] = useState(() => {
@@ -29,16 +27,14 @@ function AuthApp({ user, handleSetUser }) {
       const docRef = db.collection('todolist').doc(user.uid);
       await docRef.update({ todo: { tasks: todoList } });
       localStorage.setItem("todoList", JSON.stringify(todoList));
-      console.log("Updating tasks in firebase!");
     })();
-  }, [db, isChangedTodo, todoList]);
+  }, [db, isChangedTodo, todoList, user]);
 
   // Update local state from Firebase 
   useEffect(() => {
     (async () => {
       const response = await db.collection('todolist').doc(user.uid).get();
       if (response.data().todo.tasks) setTodoList(response.data().todo.tasks);
-      console.log("Update local state from Firebase");
     })();
   }, [user, db]);
 
@@ -76,8 +72,8 @@ function AuthApp({ user, handleSetUser }) {
     setTodoList(todoList.filter((todo, i) => i !== index));
   };
 
-  console.log(user?.email + ": " + user?.displayName + ": " + user?.uid);
-  console.log(todoList);
+  // console.log(user?.email + ": " + user?.displayName + ": " + user?.uid);
+  // console.log(todoList);
 
   return (
     <Layout logOutUser={logOutUser} user={user}>

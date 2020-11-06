@@ -3,12 +3,10 @@ import { Center, TextInput, Field, InputIcon, Flex, ErrorMessage } from '../styl
 import Modal from './Modal';
 import Layout from '../components/Layout';
 import { Button, BtnLink, Label } from '../styles/style';
-import ForgotPassword from './ForgotPassword';
+import PasswordReset from './PasswordReset';
 import { FaUser } from 'react-icons/fa';
 import { RiLockPasswordFill } from 'react-icons/ri';
 import { MdEmail } from 'react-icons/md';
-import Spinner from '../components/Spinner';
-import "react-loader-spinner/dist/loader/css/react-spinner-loader.css";
 import { useForm } from 'react-hook-form';
 
 const Login = ({ newUser, createNewUser, handleSetNewUser, errMsg }) => {
@@ -70,7 +68,7 @@ const Login = ({ newUser, createNewUser, handleSetNewUser, errMsg }) => {
           onClick={() => setToggle(true)}
         >Forgot Password?</BtnLink>
         <Modal isToggled={isToggled} setToggle={setToggle}>
-          <ForgotPassword />
+          <PasswordReset />
         </Modal>
       </div>
     </Layout>

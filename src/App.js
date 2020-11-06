@@ -82,7 +82,7 @@ export default function App() {
   };
 
   return user ?
-    <Suspense fallback={<Spinner />}>
+    <Suspense fallback={<span><Spinner /></span>}>
       <AuthApp
         user={user}
         handleSetUser={handleSetUser}
