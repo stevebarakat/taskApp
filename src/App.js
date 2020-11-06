@@ -9,29 +9,22 @@ const Login = React.lazy(() => import("./auth/Login"));
 
 export default function App() {
   const [errMsg, setErrMsg] = useState(null);
-  const [newUser, setNewUser] = useState(false);
-  const [user, setUser] = useState(() => {
-    try {
-      return JSON.parse(localStorage.getItem("user")) ?? [];
-    } catch {
-      console.error("The tasks are having issues parsing into JSON.");
-      return [];
-    }
-  });
+  const [isNewUser, setIsNewUser] = useState(false);
+  const [user, setUser] = useState(null);
 
-  const handleSetNewUser = value => {
-    setNewUser(value);
+  const handleSetIsNewUser = value => {
+    setIsNewUser(value);
   };
 
-  const handleSetUser = user => {
-    setUser(user);
+  const handleSetUser = () => {
+    setUser(null);
   };
 
   // setUser after login
   auth.onAuthStateChanged(user => user && setUser(user));
 
   const createNewUser = async (data) => {
-    if (newUser) {
+    if (isNewUser) {
       auth.createUserWithEmailAndPassword(data.email, data.password)
         .then(() => {
           registerUser(data.displayName);
@@ -90,9 +83,9 @@ export default function App() {
     </Suspense> :
     <Suspense fallback={<Spinner />}>
       <Login
-        newUser={newUser}
+        isNewUser={isNewUser}
         createNewUser={createNewUser}
-        handleSetNewUser={handleSetNewUser}
+        handleSetIsNewUser={handleSetIsNewUser}
         errMsg={errMsg}
       />
     </Suspense>;

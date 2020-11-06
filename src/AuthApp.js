@@ -18,15 +18,13 @@ function AuthApp({ user, handleSetUser }) {
   const [isChangedTodo, setIsChangedTodo] = useState(false);
   const db = firestore;
 
-  localStorage.setItem("user", JSON.stringify(user));
-
   // Update tasks in Firebase 
   useEffect(() => {
     if (!isChangedTodo) return;
     (async () => {
       const docRef = db.collection('todolist').doc(user.uid);
-      await docRef.update({ todo: { tasks: todoList } });
       localStorage.setItem("todoList", JSON.stringify(todoList));
+      await docRef.update({ todo: { tasks: todoList } });
     })();
   }, [db, isChangedTodo, todoList, user]);
 
@@ -40,7 +38,7 @@ function AuthApp({ user, handleSetUser }) {
 
   const logOutUser = () => {
     setTodoList([]);
-    handleSetUser(null);
+    handleSetUser();
     auth.signOut();
   };
 
@@ -72,7 +70,7 @@ function AuthApp({ user, handleSetUser }) {
     setTodoList(todoList.filter((todo, i) => i !== index));
   };
 
-  // console.log(user?.email + ": " + user?.displayName + ": " + user?.uid);
+  console.log(user?.email + ": " + user?.displayName + ": " + user?.uid);
   // console.log(todoList);
 
   return (

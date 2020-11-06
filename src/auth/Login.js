@@ -9,7 +9,7 @@ import { RiLockPasswordFill } from 'react-icons/ri';
 import { MdEmail } from 'react-icons/md';
 import { useForm } from 'react-hook-form';
 
-const Login = ({ newUser, createNewUser, handleSetNewUser, errMsg }) => {
+const Login = ({ isNewUser, createNewUser, handleSetIsNewUser, errMsg }) => {
   const { register, handleSubmit } = useForm();
   const [isToggled, setToggle] = useState(false);
 
@@ -17,10 +17,10 @@ const Login = ({ newUser, createNewUser, handleSetNewUser, errMsg }) => {
     <Layout>
       <div style={{ padding: "1rem" }}>
         <Center style={{ padding: "0.5rem" }}>
-          <BtnLink onClick={() => handleSetNewUser(newUser => !newUser)}>{!newUser ? "need to create an account?" : "already have an account?"}</BtnLink>
+          <BtnLink onClick={() => handleSetIsNewUser(isNewUser => !isNewUser)}>{!isNewUser ? "need to create an account?" : "already have an account?"}</BtnLink>
         </Center>
         <form onSubmit={handleSubmit(createNewUser)}>
-          {newUser && <Field>
+          {isNewUser && <Field>
             <InputIcon><FaUser /></InputIcon>
             <TextInput
               signIn
@@ -59,7 +59,7 @@ const Login = ({ newUser, createNewUser, handleSetNewUser, errMsg }) => {
           </Field>
           {errMsg && <ErrorMessage>{errMsg}</ErrorMessage>}
           <Flex>
-            <Button type="submit">{newUser ? "create account" : "sign in"}</Button>
+            <Button type="submit">{isNewUser ? "create account" : "sign in"}</Button>
           </Flex>
         </form>
         <BtnLink
