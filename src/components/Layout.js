@@ -2,11 +2,11 @@ import React from 'react';
 import Header from './Header';
 import {Container, Content} from '../styles/style';
 
-const Layout = ({ isSignedIn, user, children, logOutUser }) => {
+const Layout = ({ user, children, logOutUser }) => {
   return (
     <>
     <Container>
-      <Header isSignedIn={isSignedIn} user={user} logOutUser={logOutUser} />
+      <Header user={user} logOutUser={logOutUser} />
       <Content>
         {children}
       </Content>

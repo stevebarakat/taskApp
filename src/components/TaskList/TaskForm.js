@@ -8,7 +8,7 @@ import { BsPencil } from 'react-icons/bs';
 const TaskForm = ({ handleSetTodoList, todoList }) => {
   const { register, handleSubmit, reset } = useForm();
 
-  const onSubmit = async (data) => {
+  const onSubmit = (data) => {
     if (!!data) {
       handleSetTodoList([...todoList, {
         title: data.task,

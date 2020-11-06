@@ -26,7 +26,7 @@ const variants = {
   hidden: { opacity: 0, y: -100 },
 };
 
-const Header = ({ isSignedIn, user, logOutUser }) => {
+const Header = ({ user, logOutUser }) => {
   // Create a ref that we add to the element for which we want to detect outside clicks
   const ref = useRef();
   // State for our modal
@@ -35,13 +35,13 @@ const Header = ({ isSignedIn, user, logOutUser }) => {
   useOnClickOutside(ref, () => setModalOpen(!isModalOpen));
 
   return (
-    <StyledHeader type={isSignedIn ? 'signedIn' : 'signedOut'}>
-      {!isSignedIn && <Logo><ImList2 style={{ paddingTop: '.9rem' }} /></Logo>}
+    <StyledHeader type={user ? 'signedIn' : 'signedOut'}>
+      {!user && <Logo><ImList2 style={{ paddingTop: '.9rem' }} /></Logo>}
       <Title>Task <span style={{ fontWeight: '600' }}>App</span></Title>
-      {isSignedIn &&
+      {user &&
         <div style={{ position: "absolute", right: "18px" }}>
           <IconLink onClick={() => setModalOpen(true)}>
-            {user?.photoURL ?
+            {user.photoURL ?
               <img
                 style={{ borderRadius: "4px", border: "1px solid #707070" }}
                 alt={user.displayName}
