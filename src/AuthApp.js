@@ -10,7 +10,7 @@ function AuthApp({ logOutUser }) {
   const user = useUser();
   const [todoList, setTodoList] = useState(() => {
     try {
-      return JSON.parse(localStorage.getItem("todolist")) ?? [{
+      return JSON.parse(localStorage.getItem(user.uid)) ?? [{
         id: 'lkj645lkj5464lk456jl456',
         title: 'loading...'
       }];
@@ -31,7 +31,7 @@ function AuthApp({ logOutUser }) {
     if (!isChangedTodo) return;
     const docRef = db.collection('todolist').doc(user.uid);
     (async () => {
-      localStorage.setItem("todolist", JSON.stringify(todoList));
+      localStorage.setItem(user.uid, JSON.stringify(todoList));
       await docRef.update({ tasks: todoList });
     })();
   }, [db, isChangedTodo, todoList, user]);
