@@ -1,30 +1,37 @@
 import React, { useState, useEffect } from 'react';
-import { auth, firestore } from "./firebase";
+import { firestore } from "./firebase";
 import { findIndex } from 'lodash';
 import './styles/reset.css';
 import './styles/global.scss';
 import Layout from './components/Layout';
 import TaskList from './components/TaskList/TaskList';
 
-function AuthApp({ user, handleSetUser }) {
+function AuthApp({ user, logOutUser }) {
   const [todoList, setTodoList] = useState(() => {
     try {
-      return JSON.parse(localStorage.getItem("todoList")) ?? [];
+      return JSON.parse(localStorage.getItem("todolist")) ?? [{
+        id: 'lkj645lkj5464lk456jl456',
+        title: 'loading...'
+      }];
     } catch {
       console.error("The tasks are having issues parsing into JSON.");
-      return [];
+      return [{
+        id: 'lkj645lkj5464lk456jl456',
+        title: 'loading...'
+      }];
     }
   });
+
   const [isChangedTodo, setIsChangedTodo] = useState(false);
   const db = firestore;
 
   // Update tasks in Firebase 
   useEffect(() => {
     if (!isChangedTodo) return;
+    const docRef = db.collection('todolist').doc(user.uid);
     (async () => {
-      const docRef = db.collection('todolist').doc(user.uid);
-      localStorage.setItem("todoList", JSON.stringify(todoList));
-      await docRef.update({ todo: { tasks: todoList } });
+      localStorage.setItem("todolist", JSON.stringify(todoList));
+      await docRef.update({ tasks: todoList });
     })();
   }, [db, isChangedTodo, todoList, user]);
 
@@ -32,15 +39,10 @@ function AuthApp({ user, handleSetUser }) {
   useEffect(() => {
     (async () => {
       const response = await db.collection('todolist').doc(user.uid).get();
-      if (response.data().todo.tasks) setTodoList(response.data().todo.tasks);
+      const tasks = await response.data()?.tasks;
+      tasks && setTodoList(tasks);
     })();
   }, [user, db]);
-
-  const logOutUser = () => {
-    setTodoList([]);
-    handleSetUser();
-    auth.signOut();
-  };
 
   const handleSetTodoList = (_todoList) => {
     setIsChangedTodo(true);
@@ -62,7 +64,7 @@ function AuthApp({ user, handleSetUser }) {
 
     setTodoList(tempTasks);
     const docRef = db.collection('todolist').doc(user.uid);
-    docRef.update({ todo: { tasks: todoList } });
+    docRef.update({ tasks: todoList });
   };
 
   const deleteTodo = (index) => {

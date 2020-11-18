@@ -44,7 +44,6 @@ const TaskList = ({ handleSetTodoList, todoList, deleteTodo, updateTodo, updateT
                               <div
                                 ref={provided.innerRef}
                                 {...provided.draggableProps}
-                                // {...provided.dragHandleProps}
                                 style={{
                                   userSelect: 'none',
                                   cursor: "grabbing",

@@ -16,14 +16,15 @@ export default function App() {
     setIsNewUser(value);
   };
 
-  const handleSetUser = () => {
-    setUser(null);
+  const logOutUser = () => {
+    setUser();
+    auth.signOut();
   };
 
   // setUser after login
   auth.onAuthStateChanged(user => user && setUser(user));
 
-  const createNewUser = async (data) => {
+  const handleLogin = async (data) => {
     if (isNewUser) {
       auth.createUserWithEmailAndPassword(data.email, data.password)
         .then(() => {
@@ -38,6 +39,7 @@ export default function App() {
           setErrMsg(error.message);
         });
     }
+    setErrMsg(null)
   };
 
   const registerUser = userName => {
@@ -53,43 +55,36 @@ export default function App() {
         const collection = firestore.collection('todolist').doc(FBUser.uid);
         if (!collection.exists) {
           firestore.collection('todolist').doc(FBUser.uid).set({
-            todo: {
-              tasks: [
-                {
-                  id: 'lkj645lkj5464lk456jl456',
-                  title: 'Example task, click to edit'
-                },
-                {
-                  id: '097gdf08g7d90f8g7df098g7y',
-                  title: 'Use the button on the left to delete'
-                },
-                {
-                  id: 'kljngfifgnwrt6469fsd5ttsh',
-                  title: 'Use the handle on the right to drag'
-                },
-              ]
-            }
+            tasks: [
+              {
+                id: 'lkj645lkj5464lk456jl456',
+                title: 'Example task, click to edit'
+              },
+              {
+                id: '097gdf08g7d90f8g7df098g7y',
+                title: 'Use the button on the left to delete'
+              },
+              {
+                id: 'kljngfifgnwrt6469fsd5ttsh',
+                title: 'Use the handle on the right to drag'
+              },
+            ]
           });
         }
       });
-  };
-
-  const googleSignIn = async () => {
-    await auth.signInWithPopup(provider);
   };
 
   return user ?
     <Suspense fallback={<span><Spinner /></span>}>
       <AuthApp
         user={user}
-        handleSetUser={handleSetUser}
+        logOutUser={logOutUser}
       />
     </Suspense> :
     <Suspense fallback={<Spinner />}>
       <Login
-        googleSignIn={googleSignIn}
         isNewUser={isNewUser}
-        createNewUser={createNewUser}
+        handleLogin={handleLogin}
         handleSetIsNewUser={handleSetIsNewUser}
         errMsg={errMsg}
       />

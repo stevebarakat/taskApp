@@ -9,7 +9,7 @@ import { RiLockPasswordFill } from 'react-icons/ri';
 import { MdEmail } from 'react-icons/md';
 import { useForm } from 'react-hook-form';
 
-const Login = ({ googleSignIn, isNewUser, createNewUser, handleSetIsNewUser, errMsg }) => {
+const Login = ({ googleSignIn, isNewUser, handleLogin, handleSetIsNewUser, errMsg }) => {
   const { register, handleSubmit } = useForm();
   const [isToggled, setToggle] = useState(false);
 
@@ -19,7 +19,7 @@ const Login = ({ googleSignIn, isNewUser, createNewUser, handleSetIsNewUser, err
         <Center style={{ padding: "0.5rem" }}>
           <BtnLink onClick={() => handleSetIsNewUser(isNewUser => !isNewUser)}>{!isNewUser ? "need to create an account?" : "already have an account?"}</BtnLink>
         </Center>
-        <form onSubmit={handleSubmit(createNewUser)}>
+        <form onSubmit={handleSubmit(handleLogin)}>
           {isNewUser && <Field>
             <InputIcon><FaUser /></InputIcon>
             <TextInput
@@ -60,9 +60,6 @@ const Login = ({ googleSignIn, isNewUser, createNewUser, handleSetIsNewUser, err
           {errMsg && <ErrorMessage>{errMsg}</ErrorMessage>}
           <Flex>
             <Button type="submit">{isNewUser ? "create account" : "sign in"}</Button>
-          </Flex>
-          <Flex>
-            <Button google btnType="google" onClick={googleSignIn}>Sign in with Google</Button>
           </Flex>
         </form>
         <BtnLink
