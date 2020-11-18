@@ -9,7 +9,7 @@ import { RiLockPasswordFill } from 'react-icons/ri';
 import { MdEmail } from 'react-icons/md';
 import { useForm } from 'react-hook-form';
 
-const Login = ({ googleSignIn, isNewUser, handleLogin, handleSetIsNewUser, errMsg }) => {
+const Login = ({ isNewUser, handleLogin, handleSetIsNewUser, errMsg }) => {
   const { register, handleSubmit } = useForm();
   const [isToggled, setToggle] = useState(false);
 
