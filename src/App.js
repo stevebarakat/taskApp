@@ -1,13 +1,16 @@
 import React, { useState, Suspense } from 'react';
-import { auth, firestore, provider } from "./firebase";
+import { useAuth, useFirestore, useUser } from 'reactfire';
 import './styles/reset.css';
 import './styles/global.scss';
 import Spinner from './components/Spinner';
 import "react-loader-spinner/dist/loader/css/react-spinner-loader.css";
-const AuthApp = React.lazy(() => import("./AuthApp"));
-const Login = React.lazy(() => import("./auth/Login"));
+const AuthApp = React.lazy(() => import('./AuthApp'));
+const Login = React.lazy(() => import('./auth/Login'));
 
 export default function App() {
+  const auth = useAuth();
+  const FBUser = useUser();
+  const db = useFirestore();
   const [errMsg, setErrMsg] = useState(null);
   const [isNewUser, setIsNewUser] = useState(false);
   const [user, setUser] = useState(null);
@@ -20,9 +23,6 @@ export default function App() {
     setUser();
     auth.signOut();
   };
-
-  // setUser after login
-  auth.onAuthStateChanged(user => user && setUser(user));
 
   const handleLogin = async (data) => {
     if (isNewUser) {
@@ -52,9 +52,9 @@ export default function App() {
         setUser(FBUser);
       })
       .then(() => {
-        const collection = firestore.collection('todolist').doc(FBUser.uid);
+        const collection = db.collection('todolist').doc(FBUser.uid);
         if (!collection.exists) {
-          firestore.collection('todolist').doc(FBUser.uid).set({
+          db.collection('todolist').doc(FBUser.uid).set({
             tasks: [
               {
                 id: 'lkj645lkj5464lk456jl456',
@@ -74,7 +74,7 @@ export default function App() {
       });
   };
 
-  return user ?
+  return FBUser ?
     <Suspense fallback={<span><Spinner /></span>}>
       <AuthApp
         user={user}

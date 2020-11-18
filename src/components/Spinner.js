@@ -1,10 +1,10 @@
 import React from 'react';
 import Loader from 'react-loader-spinner';
-import { Center } from '../styles/style';
+import { StyledSpinner } from '../styles/style';
 
 const Spinner = () => {
   return (
-    <Center>
+    <StyledSpinner>
       <Loader
         type="TailSpin"
         color="#2699fb"
@@ -12,7 +12,7 @@ const Spinner = () => {
         width={100}
         timeout={3000}
       />
-    </Center>
+    </StyledSpinner>
   );
 };
 

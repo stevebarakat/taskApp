@@ -271,3 +271,11 @@ export const ErrorMessage = styled.div`
   padding: 0.5rem;
   margin-top: 0.5rem;
 `
+
+export const StyledSpinner = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+`

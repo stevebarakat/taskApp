@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { auth } from '../firebase';
+import { useAuth } from 'reactfire';
 import { Button, TextInput, Field, InputIcon, ErrorMessage } from '../styles/style';
 import { MdEmail } from 'react-icons/md';
 
 const PasswordReset = () => {
+  const auth = useAuth();
   const [resetPasswordEmail, setResetPasswordEmail] = useState('');
   const [isPasswordReset, setIsPasswordReset] = useState(false);
   const [passwordResetError, setPasswordResetError] = useState(null);

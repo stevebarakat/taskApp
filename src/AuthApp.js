@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { firestore } from "./firebase";
+import { useFirestore, useUser } from "reactfire";
 import { findIndex } from 'lodash';
 import './styles/reset.css';
 import './styles/global.scss';
 import Layout from './components/Layout';
 import TaskList from './components/TaskList/TaskList';
 
-function AuthApp({ user, logOutUser }) {
+function AuthApp({ logOutUser }) {
+  const user = useUser();
   const [todoList, setTodoList] = useState(() => {
     try {
       return JSON.parse(localStorage.getItem("todolist")) ?? [{
@@ -23,7 +24,7 @@ function AuthApp({ user, logOutUser }) {
   });
 
   const [isChangedTodo, setIsChangedTodo] = useState(false);
-  const db = firestore;
+  const db = useFirestore();
 
   // Update tasks in Firebase 
   useEffect(() => {
@@ -37,6 +38,7 @@ function AuthApp({ user, logOutUser }) {
 
   // Update local state from Firebase 
   useEffect(() => {
+    if (user === null) return;
     (async () => {
       const response = await db.collection('todolist').doc(user.uid).get();
       const tasks = await response.data()?.tasks;
