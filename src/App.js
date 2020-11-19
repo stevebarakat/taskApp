@@ -4,6 +4,7 @@ import './styles/reset.css';
 import './styles/global.scss';
 import Spinner from './components/Spinner';
 import "react-loader-spinner/dist/loader/css/react-spinner-loader.css";
+import * as serviceWorker from './serviceWorker'
 const AuthApp = React.lazy(() => import('./AuthApp'));
 const Login = React.lazy(() => import('./auth/Login'));
 
@@ -90,3 +91,7 @@ export default function App() {
       />
     </Suspense>;
 }
+// If you want your app to work offline and load faster, you can change
+// unregister() to register() below. Note this comes with some pitfalls.
+// Learn more about service workers: https://bit.ly/CRA-PWA
+serviceWorker.register()
