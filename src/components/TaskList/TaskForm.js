@@ -4,16 +4,24 @@ import { v4 as uuidv4 } from 'uuid';
 import { useForm } from 'react-hook-form';
 import { RiAddLine } from 'react-icons/ri';
 import { BsPencil } from 'react-icons/bs';
+import { useFirestore, useUser } from 'reactfire';
 
 const TaskForm = ({ handleSetTodoList, todoList }) => {
   const { register, handleSubmit, reset } = useForm();
+  const db = useFirestore();
+  const user = useUser();
 
   const onSubmit = (data) => {
     if (!!data) {
-      handleSetTodoList([...todoList, {
+      const docRef = db.collection('todolist').doc(user.uid);
+      docRef.set({tasks: [...todoList, {
         title: data.task,
         id: uuidv4(),
-      }]);
+      }]}, {merge: true});
+      // localStorage.setItem(user.uid, JSON.stringify([...todoList, {
+      //   title: data.task,
+      //   id: uuidv4(),
+      // }]));
       reset();
     }
   };
@@ -33,7 +41,6 @@ const TaskForm = ({ handleSetTodoList, todoList }) => {
         <Label htmlFor="task">Add Task</Label>
 
         <Button
-
           btnType="task"
           secondary
           type="submit"

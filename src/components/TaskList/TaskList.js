@@ -14,7 +14,7 @@ const onDragEnd = (result, todoList, updateTodo) => {
   updateTodo(_taskList);
 };
 
-const TaskList = ({ handleSetTodoList, todoList, deleteTodo, updateTodo, updateTask, isLoading }) => {
+const TaskList = ({ handleSetTodoList, todoList, deleteTodo, updateTodo, updateTask }) => {
 
   return (
     <div style={{ paddingBottom: "1.5rem" }}>
