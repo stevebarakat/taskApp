@@ -18,10 +18,10 @@ const TaskForm = ({ handleSetTodoList, todoList }) => {
         title: data.task,
         id: uuidv4(),
       }]}, {merge: true});
-      // localStorage.setItem(user.uid, JSON.stringify([...todoList, {
-      //   title: data.task,
-      //   id: uuidv4(),
-      // }]));
+      localStorage.setItem(user.uid, JSON.stringify([...todoList, {
+        title: data.task,
+        id: uuidv4(),
+      }]));
       reset();
     }
   };
