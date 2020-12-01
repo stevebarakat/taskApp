@@ -1,7 +1,15 @@
-import React, { useEffect } from 'react';
+import { useEffect, useCallback } from 'react';
 
 const useUpdateLocalState = (db, user, handleSetTodoList) => {
-  useEffect(() => {
+
+  // useCallback(
+  //   () => {
+  //     callback
+  //   },
+  //   [input],
+  // )
+
+  const memoizedHandleSetTodoList = useCallback(() => {
     const docRef = db.collection('todolist').doc(user.uid);
     return docRef.onSnapshot(snapshot => {
       const tempTasks = [];
@@ -9,7 +17,11 @@ const useUpdateLocalState = (db, user, handleSetTodoList) => {
       handleSetTodoList(snapshot.data().tasks);
       localStorage.setItem(user.uid, JSON.stringify(snapshot.data().tasks));
     });
-  }, [db, user]);
-};
+  }, [db, user, handleSetTodoList]);
 
+  useEffect(() => {
+    memoizedHandleSetTodoList();
+  }, []);
+
+};
 export default useUpdateLocalState;

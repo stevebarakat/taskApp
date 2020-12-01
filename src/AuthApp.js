@@ -5,7 +5,6 @@ import './styles/reset.css';
 import './styles/global.scss';
 import Layout from './components/Layout';
 import TaskList from './components/TaskList/TaskList';
-import useUpdateFirebase from './hooks/useUpdateFirebase';
 import useUpdateLocalState from './hooks/useUpdateLocalState';
 
 function AuthApp({ logOutUser }) {
@@ -15,7 +14,6 @@ function AuthApp({ logOutUser }) {
     id: 'lkj645lkj5464lk456jl456',
     title: 'loading...'
   }];
-  const [isChangedTodo, setIsChangedTodo] = useState(false);
 
   const [todoList, setTodoList] = useState(() => {
     try {
@@ -31,8 +29,6 @@ function AuthApp({ logOutUser }) {
   };
 
   useUpdateLocalState(db, user, handleSetTodoList);
-
-  useUpdateFirebase(db, isChangedTodo, todoList, user);
 
   const updateTodo = (todoList) => {
     const docRef = db.collection('todolist').doc(user.uid);
