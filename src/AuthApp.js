@@ -6,6 +6,7 @@ import './styles/global.scss';
 import Layout from './components/Layout';
 import TaskList from './components/TaskList/TaskList';
 import useUpdateFirebase from './hooks/useUpdateFirebase';
+import useUpdateLocalState from './hooks/useUpdateLocalState';
 
 function AuthApp({ logOutUser }) {
   const user = useUser();
@@ -24,28 +25,18 @@ function AuthApp({ logOutUser }) {
       return initialState;
     }
   });
-  // Update local state from Firebase
-  useEffect(() => {
-    const docRef = db.collection('todolist').doc(user.uid);
-    return docRef.onSnapshot(snapshot => {
-      const tempTasks = [];
-      console.log(snapshot.data());
-      tempTasks.push(snapshot.data())
-      setTodoList(snapshot.data().tasks);
-      localStorage.setItem(user.uid, JSON.stringify(snapshot.data().tasks));
-    });
-  }, [db, user]);
-  
-  useUpdateFirebase(db, isChangedTodo, todoList, user);
 
   const handleSetTodoList = (_todoList) => {
     setTodoList(_todoList);
   };
 
+  useUpdateLocalState(db, user, handleSetTodoList);
+
+  useUpdateFirebase(db, isChangedTodo, todoList, user);
+
   const updateTodo = (todoList) => {
     const docRef = db.collection('todolist').doc(user.uid);
     (async () => {
-      localStorage.setItem(user.uid, JSON.stringify(todoList));
       await docRef.update({ tasks: todoList });
     })();
     setTodoList([...todoList]);
@@ -55,7 +46,6 @@ function AuthApp({ logOutUser }) {
     let tempTasks = todoList;
     let taskIndex = findIndex(todoList, { id });
     tempTasks[taskIndex]['title'] = e.currentTarget.innerText;
-
     setTodoList(tempTasks);
     const docRef = db.collection('todolist').doc(user.uid);
     docRef.update({ tasks: todoList });
@@ -64,7 +54,6 @@ function AuthApp({ logOutUser }) {
   const deleteTodo = async (index) => {
     const docRef = db.collection('todolist').doc(user.uid);
     setTodoList(await todoList.filter((todo, i) => i !== index));
-    localStorage.setItem(await user.uid, JSON.stringify(todoList));
     await docRef.update({ tasks: todoList.filter((todo, i) => i !== index) });
   };
 
