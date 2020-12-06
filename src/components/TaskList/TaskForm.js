@@ -6,22 +6,22 @@ import { RiAddLine } from 'react-icons/ri';
 import { BsPencil } from 'react-icons/bs';
 import { useFirestore, useUser } from 'reactfire';
 
-const TaskForm = ({ handleSetTodoList, todoList }) => {
+const TaskForm = ({ taskList }) => {
   const { register, handleSubmit, reset } = useForm();
   const db = useFirestore();
   const user = useUser();
 
   const onSubmit = (data) => {
     if (!!data) {
-      const docRef = db.collection('todolist').doc(user.uid);
-      docRef.set({tasks: [...todoList, {
+      const docRef = db.collection('tasklist').doc(user.uid);
+      docRef.set({tasks: [...taskList, {
         title: data.task,
         id: uuidv4(),
       }]}, {merge: true});
-      localStorage.setItem(user.uid, JSON.stringify([...todoList, {
-        title: data.task,
-        id: uuidv4(),
-      }]));
+      // localStorage.setItem(user.uid, JSON.stringify([...taskList, {
+      //   title: data.task,
+      //   id: uuidv4(),
+      // }]));
       reset();
     }
   };

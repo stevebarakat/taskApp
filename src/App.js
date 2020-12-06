@@ -53,9 +53,9 @@ export default function App() {
         setUser(FBUser);
       })
       .then(() => {
-        const collection = db.collection('todolist').doc(FBUser.uid);
+        const collection = db.collection('tasklist').doc(FBUser.uid);
         if (!collection.exists) {
-          db.collection('todolist').doc(FBUser.uid).set({
+          db.collection('tasklist').doc(FBUser.uid).set({
             tasks: [
               {
                 id: 'lkj645lkj5464lk456jl456',
@@ -94,4 +94,4 @@ export default function App() {
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.
 // Learn more about service workers: https://bit.ly/CRA-PWA
-serviceWorker.register()
+serviceWorker.unregister()

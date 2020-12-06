@@ -5,24 +5,23 @@ import { MdDragHandle } from 'react-icons/md';
 import { VscChromeClose } from 'react-icons/vsc';
 import TaskForm from './TaskForm';
 
-const onDragEnd = (result, todoList, updateTodo) => {
+const onDragEnd = (result, taskList, updateTaskList) => {
   if (!result.destination) return;
   const { source, destination } = result;
-  const _taskList = [...todoList];
+  const _taskList = [...taskList];
   const [removed] = _taskList.splice(source.index, 1);
   _taskList.splice(destination.index, 0, removed);
-  updateTodo(_taskList);
+  updateTaskList(_taskList);
 };
 
-const TaskList = ({ handleSetTodoList, todoList, deleteTodo, updateTodo, updateTask }) => {
+const TaskList = ({ taskList, deleteTodo, updateTaskList, updateTask }) => {
 
   return (
     <div style={{ paddingBottom: "1.5rem" }}>
       <TaskForm
-        todoList={todoList}
-        handleSetTodoList={handleSetTodoList}
+        taskList={taskList}
       />
-      <DragDropContext onDragEnd={result => onDragEnd(result, todoList, updateTodo)}>
+      <DragDropContext onDragEnd={result => onDragEnd(result, taskList, updateTaskList)}>
         <Droppable droppableId={'list'}>
           {(provided, snapshot) => {
             return (
@@ -33,12 +32,12 @@ const TaskList = ({ handleSetTodoList, todoList, deleteTodo, updateTodo, updateT
                   opacity: snapshot.isDraggingOver ? '0.5' : '1'
                 }}
               >
-                {todoList.length === 0 ?
+                {taskList.length === 0 ?
                   <p>You don't have any tasks.</p> :
                   <div>
-                    {todoList?.map((todo, index) => {
+                    {taskList?.map((task, index) => {
                       return (
-                        <Draggable key={todo.id} draggableId={todo.id} index={index}>
+                        <Draggable key={task.id} draggableId={task.id} index={index}>
                           {(provided, snapshot) => {
                             return (
                               <div
@@ -57,10 +56,10 @@ const TaskList = ({ handleSetTodoList, todoList, deleteTodo, updateTodo, updateT
                                       contentEditable
                                       suppressContentEditableWarning
                                       onBlur={e => {
-                                        updateTask(e, todo.id);
+                                        updateTask(e, task.id);
                                       }}
                                     >
-                                      {todo.title}
+                                      {task.title}
                                     </TaskText>
                                   </ListItem>
                                   <EndCap {...provided.dragHandleProps}>

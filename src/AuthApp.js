@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useFirestore, useUser } from "reactfire";
 import { findIndex } from 'lodash';
 import './styles/reset.css';
@@ -6,6 +6,7 @@ import './styles/global.scss';
 import Layout from './components/Layout';
 import TaskList from './components/TaskList/TaskList';
 import useUpdateLocalState from './hooks/useUpdateLocalState';
+import useUpdateFirebase from './hooks/useUpdateFirebase';
 
 function AuthApp({ logOutUser }) {
   const user = useUser();
@@ -15,7 +16,8 @@ function AuthApp({ logOutUser }) {
     title: 'loading...'
   }];
 
-  const [todoList, setTodoList] = useState(() => {
+  const [isChangedTask, setIsChangedTask] = useState(false);
+  const [taskList, setTaskList] = useState(() => {
     try {
       return JSON.parse(localStorage.getItem(user.uid)) ?? initialState;
     } catch {
@@ -24,33 +26,37 @@ function AuthApp({ logOutUser }) {
     }
   });
 
-  const handleSetTodoList = (_todoList) => {
-    setTodoList(_todoList);
+  useUpdateLocalState(db, user, taskList, handleSetTaskList);
+  useUpdateFirebase(taskList, isChangedTask);
+
+  function handleSetTaskList (_taskList) {
+    setTaskList(_taskList);
   };
 
-  useUpdateLocalState(db, user, handleSetTodoList);
-
-  const updateTodo = (todoList) => {
-    const docRef = db.collection('todolist').doc(user.uid);
+  const updateTaskList = (taskList) => {
+    const docRef = db.collection('tasklist').doc(user.uid);
     (async () => {
-      await docRef.update({ tasks: todoList });
+      await docRef.update({ tasks: taskList });
     })();
-    setTodoList([...todoList]);
+    setIsChangedTask(true);
+    setTaskList([...taskList]);
   };
 
   const updateTask = (e, id) => {
-    let tempTasks = todoList;
-    let taskIndex = findIndex(todoList, { id });
+    let tempTasks = taskList;
+    let taskIndex = findIndex(taskList, { id });
     tempTasks[taskIndex]['title'] = e.currentTarget.innerText;
-    setTodoList(tempTasks);
-    const docRef = db.collection('todolist').doc(user.uid);
-    docRef.update({ tasks: todoList });
+    setTaskList(tempTasks);
+    const docRef = db.collection('tasklist').doc(user.uid);
+    docRef.update({ tasks: taskList });
+    setIsChangedTask(true);
   };
 
   const deleteTodo = async (index) => {
-    const docRef = db.collection('todolist').doc(user.uid);
-    setTodoList(await todoList.filter((todo, i) => i !== index));
-    await docRef.update({ tasks: todoList.filter((todo, i) => i !== index) });
+    const docRef = db.collection('tasklist').doc(user.uid);
+    setTaskList(await taskList.filter((task, i) => i !== index));
+    await docRef.update({ tasks: taskList.filter((task, i) => i !== index) });
+    setIsChangedTask(true);
   };
 
   console.log(user?.email + ": " + user?.displayName + ": " + user?.uid);
@@ -58,11 +64,11 @@ function AuthApp({ logOutUser }) {
   return (
     <Layout logOutUser={logOutUser} user={user}>
       <TaskList
-        todoList={todoList}
+        taskList={taskList}
         deleteTodo={deleteTodo}
-        updateTodo={updateTodo}
+        updateTaskList={updateTaskList}
         updateTask={updateTask}
-        handleSetTodoList={handleSetTodoList}
+        handleSetTaskList={handleSetTaskList}
       />
     </Layout>
   );

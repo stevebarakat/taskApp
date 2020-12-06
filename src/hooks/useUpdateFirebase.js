@@ -1,13 +1,17 @@
-import {useEffect} from 'react'
+import { useEffect } from 'react';
+import { useFirestore, useUser } from 'reactfire';
 
-function useUpdateFirebase(db, isChangedTodo, todoList, user) {
+function useUpdateFirebase(taskList, isChangedTask) {
+  const db = useFirestore();
+  const user = useUser();
+  
   useEffect(() => {
-    if (!isChangedTodo) return;
+    if (!isChangedTask) return;
     (async () => {
-      const docRef = db.collection('todolist').doc(user.uid);
-      await docRef.update({ tasks: todoList });
+      const docRef = db.collection('tasklist').doc(user.uid);
+      await docRef.update({ tasks: taskList });
     })();
-  }, [db, isChangedTodo, todoList, user]);
+  }, [db, isChangedTask, taskList, user]);
 }
 
-export default useUpdateFirebase
+export default useUpdateFirebase;
