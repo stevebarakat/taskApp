@@ -22,6 +22,7 @@ export const BtnLink = styled.button`
   color: #AAA;
   background: none;
   font-size: ${p => p.secondary ? '0.8rem' : '1rem'};
+  margin: 0;
   border: none;
   border-bottom: ${p => p.task ? `1px solid ${borderColor}` : 'none'};
   &:focus,
@@ -203,6 +204,7 @@ export const TextInput = styled.input`
   color: ${textColor};
   transition: all 0.1s;
   touch-action: manipulation;
+  border-radius: 0;
   &:focus {
     outline: 0;
     background: none;
