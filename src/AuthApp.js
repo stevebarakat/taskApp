@@ -15,10 +15,24 @@ function AuthApp({ logOutUser }) {
     id: 'lkj645lkj5464lk456jl456',
     title: 'loading...'
   }];
+  const initialTasks = [
+    {
+      id: 'lkj645lkj5464lk456jl456',
+      title: 'Example task, click to edit'
+    },
+    {
+      id: '097gdf08g7d90f8g7df098g7y',
+      title: 'Use the button on the left to delete'
+    },
+    {
+      id: 'kljngfifgnwrt6469fsd5ttsh',
+      title: 'Use the handle on the right to drag'
+    },
+  ];
 
   const [taskList, setTaskList] = useState(() => {
     try {
-      return JSON.parse(localStorage.getItem(user.uid)) ?? initialState;
+      return JSON.parse(localStorage.getItem(user.uid)) ?? initialTasks;
     } catch {
       console.error("The tasks are having issues parsing into JSON.");
       return initialState;
