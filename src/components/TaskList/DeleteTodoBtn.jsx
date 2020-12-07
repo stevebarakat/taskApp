@@ -1,10 +1,10 @@
 import React from 'react'
 import { Button } from '../../styles/style';
 
-const DeleteTodoBtn = ( {deleteTodo, index}) => {
+const DeleteTodoBtn = ( {deleteTask, index}) => {
   return (
     <>
-      <Button onClick={() => deleteTodo(index)}>x</Button>
+      <Button onClick={() => deleteTask(index)}>x</Button>
     </>
   )
 }

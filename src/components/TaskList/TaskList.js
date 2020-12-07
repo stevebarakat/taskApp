@@ -14,7 +14,7 @@ const onDragEnd = (result, taskList, updateTaskList) => {
   updateTaskList(_taskList);
 };
 
-const TaskList = ({ taskList, deleteTodo, updateTaskList, updateTask }) => {
+const TaskList = ({ taskList, deleteTask, updateTaskList, updateTask }) => {
 
   return (
     <div style={{ paddingBottom: "1.5rem" }}>
@@ -51,7 +51,7 @@ const TaskList = ({ taskList, deleteTodo, updateTaskList, updateTask }) => {
                                 }}
                               >
                                 <ListItemContainer>
-                                  <BtnLink task onClick={() => deleteTodo(index)}><VscChromeClose /></BtnLink>                                  <ListItem>
+                                  <BtnLink task onClick={() => deleteTask(index)}><VscChromeClose /></BtnLink>                                  <ListItem>
                                     <TaskText
                                       contentEditable
                                       suppressContentEditableWarning
