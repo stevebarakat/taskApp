@@ -32,10 +32,10 @@ function AuthApp({ logOutUser }) {
 
   const [taskList, setTaskList] = useState(() => {
     try {
-      return JSON.parse(localStorage.getItem(user.uid)) ?? initialTasks;
+      return JSON.parse(localStorage.getItem(user.uid)) ?? initialState;
     } catch {
       console.error("The tasks are having issues parsing into JSON.");
-      return initialState;
+      return initialTasks;
     }
   });
 
