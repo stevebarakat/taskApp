@@ -9,8 +9,7 @@ const useUpdateLocalState = (db, user, taskList, handleSetTaskList) => {
       handleSetTaskList(snapshot.data().tasks);
       localStorage.setItem(user.uid, JSON.stringify(snapshot.data().tasks));
     });
-    // eslint-disable-next-line
-  }, [ db, user ]);
+  }, [ db, user, handleSetTaskList ]);
 
 };
 export default useUpdateLocalState;

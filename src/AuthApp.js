@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { useFirestore, useUser } from "reactfire";
 import { findIndex } from 'lodash';
 import './styles/reset.css';
@@ -7,44 +7,28 @@ import Layout from './components/Layout';
 import TaskList from './components/TaskList/TaskList';
 import useUpdateLocalState from './hooks/useUpdateLocalState';
 import useUpdateFirebase from './hooks/useUpdateFirebase';
+import initialStates from './initialStates';
+
 
 function AuthApp({ logOutUser }) {
   const user = useUser();
   const db = useFirestore();
-  const initialState = [{
-    id: 'lkj645lkj5464lk456jl456',
-    title: 'loading...'
-  }];
-  const initialTasks = [
-    {
-      id: 'lkj645lkj5464lk456jl456',
-      title: 'Example task, click to edit'
-    },
-    {
-      id: '097gdf08g7d90f8g7df098g7y',
-      title: 'Use the button on the left to delete'
-    },
-    {
-      id: 'kljngfifgnwrt6469fsd5ttsh',
-      title: 'Use the handle on the right to drag'
-    },
-  ];
-
-  const [taskList, setTaskList] = useState(() => {
+  const initialState = () => {
     try {
-      return JSON.parse(localStorage.getItem(user.uid)) ?? initialState;
+      return JSON.parse(localStorage.getItem(user.uid)) ?? initialStates.loadingState;
     } catch {
       console.error("The tasks are having issues parsing into JSON.");
-      return initialTasks;
+      return initialStates.initialTasks;
     }
-  });
+  }
+  
+  const [taskList, setTaskList] = useState(initialState);
 
+  const handleSetTaskList = useCallback((_taskList) => {
+    setTaskList(_taskList);
+  }, [])
   useUpdateLocalState(db, user, taskList, handleSetTaskList);
   useUpdateFirebase(taskList);
-
-  function handleSetTaskList (_taskList) {
-    setTaskList(_taskList);
-  };
 
   const updateTaskList = (taskList) => {
     const docRef = db.collection('tasklist').doc(user.uid);
