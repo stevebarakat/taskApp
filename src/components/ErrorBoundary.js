@@ -1,10 +1,9 @@
 import React from 'react';
-import { Container, Center } from '../styles/style';
 
 class ErrorBoundary extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { hasError: true };
+    this.state = { hasError: false };
   }
 
   static getDerivedStateFromError(error) {
@@ -15,18 +14,10 @@ class ErrorBoundary extends React.Component {
   render() {
     if (this.state.hasError) {
       // You can render any custom fallback UI
-      return (
-        <Container>
-          <Center>
-            <h4>Something weird happened.</h4>
-            <button onClick={() => window.location.reload()}>Try Again</button>
-          </Center>
-        </Container>
-
-      );
+      return <h1>Something went wrong.</h1>;
     }
 
-    return this.props.children;
+    return this.props.children; 
   }
 };
 
