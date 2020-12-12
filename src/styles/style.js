@@ -1,5 +1,6 @@
 import styled from 'styled-components';
-import { bodyBg, inputBg, colorPrimary, borderColor, textColor} from './colors';
+import { inputBg, colorPrimary, borderColor, textColor } from './colors';
+import { motion } from 'framer-motion';
 
 export const Container = styled.div`
   max-width: 100%;
@@ -21,10 +22,8 @@ export const BtnLink = styled.button`
   text-transform: capitalize;
   color: #AAA;
   background: none;
-  font-size: ${p => p.secondary ? '0.8rem' : '1rem'};
   margin: 0;
   border: none;
-  border-bottom: ${p => p.task ? `1px solid ${borderColor}` : 'none'};
   &:focus,
   &:hover {
     color: #FFF;
@@ -37,14 +36,11 @@ export const EndCap = styled.div`
   font-size: 1.25rem;
   text-align: center;
   color: ${borderColor};
-  border: none;
-  border-bottom: 1px solid ${borderColor};
-  background: none;
   &:hover,
   &:focus{
     color: #FFF;
   }
-  `;
+`;
 
 export const DragHandle = styled.div`
   display: flex;
@@ -54,17 +50,6 @@ export const DragHandle = styled.div`
     color: #FFF;
   }
 `;
-
-// const handleButtonType = btnType => {
-//   switch (btnType) {
-//     case "google":
-//       return "1px solid #de5246";
-//     case "task":
-//       return `1px solid ${borderColor}`;
-//     default:
-//       return `1px solid ${borderColor}`;
-//   }
-// };
 
 export const Button = styled.button`
   color: ${borderColor};
@@ -143,21 +128,20 @@ export const StyledTaskForm = styled.form`
   margin: 1.5rem 0 1.5rem;
 `;
 
-export const ListItemContainer = styled.div`
+export const ListItemContainer = styled(motion.div)`
   display: grid;
   grid-template-columns: 50px 1fr 50px;
   justify-content: space-between;
   transition: all .15s;
-  border-left: 8px solid ${bodyBg}; */
+  border-bottom: 1px solid ${borderColor};
   &:hover,
   &:active {
     button,
     div:nth-child(3){
       color: #FFF;
     }
-    background: ${inputBg};
     color: ${textColor};
-    border-left: 8px solid ${colorPrimary}; */
+    border-bottom: 1px solid ${textColor};
   }
 `;
 
@@ -173,7 +157,6 @@ export const ListItem = styled.li`
   list-style: none; 
   padding-top: 12px;
   padding-left: 0.25rem;
-  border-bottom: 1px solid ${borderColor};
   padding: 1rem 0;
 `;
 
@@ -255,7 +238,6 @@ export const BackDrop = styled.div`
 `;
 
 export const InputIcon = styled.div`
-  /* background: ${p => p.google ? '#de5246' : `${colorPrimary}`}; */
   padding: .75rem 1rem;
   z-index: 1;
   color: ${borderColor};
@@ -269,10 +251,9 @@ export const ErrorMessage = styled.div`
   color: #de5246;
   background: hsla(5, 70%, 57%, 0.15);
   border: 1px solid #de5246;
-  /* border-radius: 4px; */
   padding: 0.5rem;
   margin-top: 0.5rem;
-`
+`;
 
 export const StyledSpinner = styled.div`
   display: flex;
@@ -280,4 +261,4 @@ export const StyledSpinner = styled.div`
   justify-content: center;
   align-items: center;
   height: 100vh;
-`
+`;
