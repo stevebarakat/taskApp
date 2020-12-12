@@ -6,13 +6,12 @@ import Spinner from './components/Spinner';
 import App from './App';
 
 const firebaseConfig = {
-  apiKey: "AIzaSyAA_xRLrWMlxNf88Ck5WrQETPuss7lHGyg",
-  authDomain: "steves-task-app.firebaseapp.com",
-  databaseURL: "https://steves-task-app.firebaseio.com",
-  projectId: "steves-task-app",
-  storageBucket: "steves-task-app.appspot.com",
-  messagingSenderId: "839670568204",
-  appId: "1:839670568204:web:4b5775865002cab2dc6529"
+  apiKey: "AIzaSyAuFeyJGW-2b0i8vDzt3m2rfRgvhcUsXrA",
+  authDomain: "task-app-swipe.firebaseapp.com",
+  projectId: "task-app-swipe",
+  storageBucket: "task-app-swipe.appspot.com",
+  messagingSenderId: "22581657190",
+  appId: "1:22581657190:web:289287ea928c479b3bf7a7"
 };
 
 ReactDOM.unstable_createRoot(

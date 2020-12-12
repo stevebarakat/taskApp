@@ -14,7 +14,7 @@ export const Container = styled.div`
 export const Content = styled.main`
   max-width: 800px;
   margin: 0 auto;
-  padding: 0 1rem;
+  padding: 0 1rem 1rem;
 `;
 
 export const BtnLink = styled.button`
