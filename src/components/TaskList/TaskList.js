@@ -18,12 +18,6 @@ const onDragEnd = (result, taskList, updateTaskList) => {
 const TaskList = ({ taskList, deleteTask, updateTaskList, updateTask, handleSetTaskList }) => {
   const controls = useAnimation();
 
-  async function handleDrag(event, info, index) {
-    // if (info.offset.x < -100 || info.velocity.x < -500) {
-    //   await controls.start({ y: 0, transition: { duration: 0.5 } });
-    // }
-  }
-
   async function handleDragEnd(event, info, index) {
     if (info.offset.x < -100 || info.velocity.x < -500) {
       await controls.start({ y: 0, transition: { duration: 0.5 } });
@@ -71,8 +65,6 @@ const TaskList = ({ taskList, deleteTask, updateTaskList, updateTask, handleSetT
                                   drag="x"
                                   // dragConstraints={{ top: 0, bottom: 0 }}
                                   dragDirectionLock
-                                  // layout
-                                  onDrag={(event, info) => handleDrag(event, info, index)}
                                   onDragEnd={(event, info) => handleDragEnd(event, info, index)}
                                   animate={controls}
                                   exit={{ y: 0 }}
