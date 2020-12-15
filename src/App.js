@@ -5,6 +5,7 @@ import './styles/global.scss';
 import Spinner from './components/Spinner';
 import "react-loader-spinner/dist/loader/css/react-spinner-loader.css";
 import * as serviceWorker from './serviceWorker'
+import initialStates from "./initialStates";
 const AuthApp = React.lazy(() => import('./AuthApp'));
 const Login = React.lazy(() => import('./auth/Login'));
 
@@ -56,20 +57,7 @@ export default function App() {
         const collection = db.collection('tasklist').doc(FBUser.uid);
         if (!collection.exists) {
           db.collection('tasklist').doc(FBUser.uid).set({
-            tasks: [
-              {
-                id: 'lkj645lkj5464lk456jl456',
-                title: 'Example task, click to edit'
-              },
-              {
-                id: '097gdf08g7d90f8g7df098g7y',
-                title: 'Use the button on the left to delete'
-              },
-              {
-                id: 'kljngfifgnwrt6469fsd5ttsh',
-                title: 'Use the handle on the right to drag'
-              },
-            ]
+            tasks: initialStates.initialTasks
           });
         }
       });

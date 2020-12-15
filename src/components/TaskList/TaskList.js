@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
-import { useAnimation, AnimatePresence } from "framer-motion";
+import { useAnimation } from "framer-motion";
 import { ListItem, ListItemContainer, EndCap, TaskText, BtnLink } from '../../styles/style';
 import { MdDragHandle } from 'react-icons/md';
 import { VscChromeClose } from 'react-icons/vsc';
@@ -15,7 +15,7 @@ const onDragEnd = (result, taskList, updateTaskList) => {
   updateTaskList(_taskList);
 };
 
-const TaskList = ({ taskList, deleteTask, updateTaskList, updateTask, handleSetTaskList }) => {
+const TaskList = ({ taskList, deleteTask, updateTaskList, updateTask }) => {
   const controls = useAnimation();
 
   async function handleDragEnd(event, info, index) {
@@ -23,7 +23,7 @@ const TaskList = ({ taskList, deleteTask, updateTaskList, updateTask, handleSetT
       await controls.start({ y: 0, transition: { duration: 0.5 } });
       await deleteTask(index);
     } else {
-      controls.start({ x: 0, opacity: 1, transition: { duration: 0.5 }, color: "red" });
+      controls.start({ y: 0, x: 0 });
     }
   }
 
@@ -54,6 +54,7 @@ const TaskList = ({ taskList, deleteTask, updateTaskList, updateTask, handleSetT
                               <div
                                 ref={provided.innerRef}
                                 {...provided.draggableProps}
+                                {...provided.dragHandleProps}
                                 style={{
                                   userSelect: 'none',
                                   cursor: "grabbing",
@@ -62,13 +63,11 @@ const TaskList = ({ taskList, deleteTask, updateTaskList, updateTask, handleSetT
                                 }}
                               >
                                 <ListItemContainer
-                                  drag="x"
-                                  // dragConstraints={{ top: 0, bottom: 0 }}
+                                  drag
                                   dragDirectionLock
+                                  dragElastic={0}
                                   onDragEnd={(event, info) => handleDragEnd(event, info, index)}
                                   animate={controls}
-                                  exit={{ y: 0 }}
-                                  style={{ background: 'hsla(216, 18%, 21%, 0.5)' }}
                                 >
                                   <BtnLink task onClick={() => deleteTask(index)}><VscChromeClose /></BtnLink>                                  <ListItem>
                                     <TaskText
@@ -81,7 +80,9 @@ const TaskList = ({ taskList, deleteTask, updateTaskList, updateTask, handleSetT
                                       {task.title}
                                     </TaskText>
                                   </ListItem>
-                                  <EndCap {...provided.dragHandleProps}>
+                                  <EndCap
+                                    // {...provided.dragHandleProps}
+                                  >
                                     <MdDragHandle style={{ margin: "auto" }} />
                                   </EndCap>
                                 </ListItemContainer>
